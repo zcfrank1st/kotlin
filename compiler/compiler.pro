@@ -1,4 +1,4 @@
--injars '<kotlin-compiler-jar-before-shrink>'(
+-injars '<output>/kotlin-compiler-before-shrink.jar'(
 !com/thoughtworks/xstream/converters/extended/ISO8601**,
 !com/thoughtworks/xstream/converters/reflection/CGLIBEnhancedConverter**,
 !com/thoughtworks/xstream/io/xml/JDom**,
@@ -22,8 +22,7 @@
 META-INF/services/**,META-INF/native/**,META-INF/extensions/**,META-INF/MANIFEST.MF,
 messages/**)
 
--outjars '<kotlin-compiler-jar>'
-#-outjars '<kotlin-home>/lib/kotlin-compiler.jar'
+-outjars '<kotlin-home>/lib/kotlin-compiler.jar'
 
 -dontnote **
 -dontwarn com.intellij.util.ui.IsRetina*
@@ -53,11 +52,11 @@ messages/**)
 -dontwarn javaslang.match.annotation.Unapply
 -dontwarn javaslang.match.annotation.Patterns
 
-# -libraryjars '<rtjar>'
-# -libraryjars '<jssejar>'
-# -libraryjars '<bootstrap.runtime>'
-# -libraryjars '<bootstrap.reflect>'
-# -libraryjars '<bootstrap.script.runtime>'
+-libraryjars '<rtjar>'
+-libraryjars '<jssejar>'
+-libraryjars '<bootstrap.runtime>'
+-libraryjars '<bootstrap.reflect>'
+-libraryjars '<bootstrap.script.runtime>'
 
 -dontoptimize
 -dontobfuscate
