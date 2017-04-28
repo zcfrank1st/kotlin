@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.uast.UDeclaration
 
 
-class KotlinCommonModifications : CommonModifications() {
+class KotlinCommonModifications : JvmCommonCodeModifications() {
     override fun createChangeModifierAction(declaration: UDeclaration, modifier: String, shouldPresent: Boolean): IntentionAction? {
         val kModifierOwner = (declaration.psi as? KtLightElement<*, *>?)?.kotlinOrigin as? KtModifierListOwner?
                              ?: throw IllegalArgumentException("$declaration is expected to contain KtLightElement with KtModifierListOwner")
@@ -36,12 +36,11 @@ class KotlinCommonModifications : CommonModifications() {
         else
             javaPsiModifiersMapping[modifier] to shouldPresent
 
-        if(kToken == null)
-            return null
-        if (shouldPresentMapped)
-            return AddModifierFix(kModifierOwner, kToken)
+        if (kToken == null) return null
+        return if (shouldPresentMapped)
+            AddModifierFix.createIfApplicable(kModifierOwner, kToken)
         else
-            return RemoveModifierFix(kModifierOwner, kToken, false)
+            RemoveModifierFix(kModifierOwner, kToken, false)
     }
 
     companion object {

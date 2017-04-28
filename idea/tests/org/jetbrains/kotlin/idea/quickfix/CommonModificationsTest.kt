@@ -16,7 +16,7 @@
 
 package org.jetbrains.kotlin.idea.quickfix
 
-import com.intellij.codeInsight.intention.CommonModifications
+import com.intellij.codeInsight.intention.JvmCommonCodeModifications
 import com.intellij.lang.Language
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.psi.PsiModifier
@@ -25,6 +25,7 @@ import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCa
 import org.jetbrains.uast.UDeclaration
 import org.jetbrains.uast.UastContext
 import org.jetbrains.uast.convert
+import org.junit.Assert
 
 
 class CommonModificationsTest : LightPlatformCodeInsightFixtureTestCase() {
@@ -36,7 +37,7 @@ class CommonModificationsTest : LightPlatformCodeInsightFixtureTestCase() {
         }
         """)
 
-        myFixture.launchAction(uastChangeModifiers.createChangeModifierAction(uastElementAtCaret(myFixture), PsiModifier.FINAL, false )!!)
+        myFixture.launchAction(codeModifications.createChangeModifierAction(uastElementAtCaret(myFixture), PsiModifier.FINAL, false )!!)
         myFixture.checkResult("""
         class Foo {
             open fun bar(){}
@@ -51,7 +52,7 @@ class CommonModificationsTest : LightPlatformCodeInsightFixtureTestCase() {
         }
         """)
 
-        myFixture.launchAction(uastChangeModifiers.createChangeModifierAction(uastElementAtCaret(myFixture), PsiModifier.PRIVATE, true )!!)
+        myFixture.launchAction(codeModifications.createChangeModifierAction(uastElementAtCaret(myFixture), PsiModifier.PRIVATE, true )!!)
         myFixture.checkResult("""
         private class Foo {
             fun bar(){}
@@ -66,12 +67,21 @@ class CommonModificationsTest : LightPlatformCodeInsightFixtureTestCase() {
         }
         """.trim())
 
-        myFixture.launchAction(uastChangeModifiers.createChangeModifierAction(uastElementAtCaret(myFixture), PsiModifier.PRIVATE, false )!!)
+        myFixture.launchAction(codeModifications.createChangeModifierAction(uastElementAtCaret(myFixture), PsiModifier.PRIVATE, false )!!)
         myFixture.checkResult("""
         class Foo {
             fun bar(){}
         }
         """.trim(), true)
+    }
+
+    fun testDontMakeFunInObjectsOpen() {
+        myFixture.configureByText("foo.kt", """
+        object Foo {
+            fun bar<caret>(){}
+        }
+        """.trim())
+        Assert.assertNull(codeModifications.createChangeModifierAction(uastElementAtCaret(myFixture), PsiModifier.FINAL, false))
     }
 
     private fun uastElementAtCaret(myFixture: CodeInsightTestFixture): UDeclaration {
@@ -81,8 +91,8 @@ class CommonModificationsTest : LightPlatformCodeInsightFixtureTestCase() {
         return uastLanguagePlugin.convert<UDeclaration>(elementAtCaret, null)
     }
 
-    private val uastChangeModifiers: CommonModifications
-        get() = CommonModifications.forLanguage(Language.findLanguageByID("kotlin")!!)
+    private val codeModifications: JvmCommonCodeModifications
+        get() = JvmCommonCodeModifications.forLanguage(Language.findLanguageByID("kotlin")!!)
 
 }
 
