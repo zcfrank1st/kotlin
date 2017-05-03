@@ -48,6 +48,7 @@
 
         <sequential if:set="isWindows">
             <get src="${url.node.exe}" dest="${node.exe}" usetimestamp="true"/>
+            <delete file="${node.executable}"/>
         </sequential>
     </target>
 
