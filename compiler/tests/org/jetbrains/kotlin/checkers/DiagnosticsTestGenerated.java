@@ -12208,6 +12208,12 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("syntheticPropertyResolvedToOwnerFunction.kt")
+            public void testSyntheticPropertyResolvedToOwnerFunction() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/j+k/syntheticPropertyResolvedToOwnerFunction.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("traitDefaultCall.kt")
             public void testTraitDefaultCall() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/j+k/traitDefaultCall.kt");
