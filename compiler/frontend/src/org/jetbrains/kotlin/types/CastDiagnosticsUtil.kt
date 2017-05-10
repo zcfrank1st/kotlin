@@ -220,7 +220,7 @@ object CastDiagnosticsUtil {
             typeChecker: KotlinTypeChecker,
             shouldCheckForExactType: Boolean
     ): Boolean {
-        val intersectedType = TypeIntersector.intersectTypes(typeChecker, possibleTypes) ?: return false
+        val intersectedType = TypeIntersector.intersectTypes(typeChecker, possibleTypes.map { it.upperIfFlexible() }) ?: return false
 
         return if (shouldCheckForExactType)
             isExactTypeCast(intersectedType, targetType)
