@@ -68,16 +68,16 @@ class K2JSDce : CLITool<K2JSDceArguments>() {
 
     private fun checkSourceFiles(messageCollector: MessageCollector, files: List<InputFile>): Boolean {
         return files.fold(true) { ok, file ->
-            val inputFile = File(file.name)
+            val inputFile = File(file.path)
             val outputFile = File(file.outputName)
 
             val inputOk = when {
                 !inputFile.exists() -> {
-                    messageCollector.report(CompilerMessageSeverity.ERROR, "source file or directory not found: " + file.name)
+                    messageCollector.report(CompilerMessageSeverity.ERROR, "source file or directory not found: " + file.path)
                     false
                 }
                 inputFile.isDirectory -> {
-                    messageCollector.report(CompilerMessageSeverity.ERROR, "input file '" + file.name + "' is a directory")
+                    messageCollector.report(CompilerMessageSeverity.ERROR, "input file '" + file.path + "' is a directory")
                     false
                 }
                 else -> true
