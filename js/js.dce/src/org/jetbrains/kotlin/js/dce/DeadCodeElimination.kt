@@ -18,7 +18,6 @@ package org.jetbrains.kotlin.js.dce
 
 import com.google.gwt.dev.js.rhino.CodePosition
 import com.google.gwt.dev.js.rhino.ErrorReporter
-import com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.js.backend.ast.JsBlock
 import org.jetbrains.kotlin.js.backend.ast.JsGlobalBlock
 import org.jetbrains.kotlin.js.backend.ast.JsNode
@@ -31,19 +30,14 @@ import java.io.File
 
 class DeadCodeElimination(val logConsumer: (String) -> Unit) {
     val moduleMapping = mutableMapOf<JsBlock, String>()
-    val reachableNames = mutableSetOf<String>()
+    private val reachableNames = mutableSetOf<String>()
 
     var reachableNodes = setOf<Node>()
         get
         private set
 
-    lateinit var globalScope: Node
-        get
-        private set
-
     fun apply(root: JsNode) {
         val context = Context()
-        globalScope = context.globalScope
 
         val topLevelVars = collectDefinedNames(root)
         context.addLocalVars(topLevelVars)
@@ -74,16 +68,14 @@ class DeadCodeElimination(val logConsumer: (String) -> Unit) {
                 rootReachableNames: Set<String>,
                 logConsumer: (String) -> Unit
         ): DeadCodeEliminationResult {
-            val resolvedFiles = resolveFiles(inputFiles)
-
-            val codeList = resolvedFiles.map { FileUtil.loadFile(File(it.name)) }
             val program = JsProgram()
             val dce = DeadCodeElimination(logConsumer)
 
-            val blocks = resolvedFiles.zip(codeList).map { (file, code) ->
+            val blocks = inputFiles.map { file ->
                 val block = JsGlobalBlock()
-                block.statements += parse(code, reporter, program.scope, file.name)
-                dce.moduleMapping[block] = file.moduleName
+                val code = File(file.path).readText()
+                block.statements += parse(code, reporter, program.scope, file.path)
+                file.moduleName?.let { dce.moduleMapping[block] = it }
                 block
             }
             program.globalBlock.statements += blocks
@@ -92,18 +84,11 @@ class DeadCodeElimination(val logConsumer: (String) -> Unit) {
             dce.reachableNames += rootReachableNames
             dce.apply(program.globalBlock)
 
-            for ((file, block) in resolvedFiles.zip(blocks)) {
-                FileUtil.writeToFile(File(file.outputName), block.toString())
+            for ((file, block) in inputFiles.zip(blocks)) {
+               File(file.outputName).writeText(block.toString())
             }
 
             return DeadCodeEliminationResult(dce.reachableNodes)
-        }
-
-        private fun resolveFiles(inputFiles: Collection<InputFile>): Collection<ResolvedInputFile> = inputFiles.map { inputFile ->
-            val file = File(inputFile.name)
-            val outputFile = inputFile.outputName?.let { File(it) } ?: File(file.parentFile, file.nameWithoutExtension + ".min.js")
-            val moduleName = inputFile.moduleName ?: file.nameWithoutExtension
-            ResolvedInputFile(inputFile.name, outputFile.path, moduleName)
         }
 
         private val reporter = object : ErrorReporter {
@@ -116,6 +101,4 @@ class DeadCodeElimination(val logConsumer: (String) -> Unit) {
             }
         }
     }
-
-    internal class ResolvedInputFile(val name: String, val outputName: String, val moduleName: String)
 }

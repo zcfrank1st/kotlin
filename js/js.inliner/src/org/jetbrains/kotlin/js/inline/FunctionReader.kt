@@ -58,7 +58,7 @@ class FunctionReader(private val config: JsConfig, private val currentModuleName
      * kotlinVariable: kotlin object variable.
      *     The default variable is Kotlin, but it can be renamed by minifier.
      */
-    data class ModuleInfo(val fileContent: String, val moduleVariable: String, val kotlinVariable: String)
+    data class ModuleInfo(val filePath: String, val fileContent: String, val moduleVariable: String, val kotlinVariable: String)
 
     private val moduleNameToInfo = HashMultimap.create<String, ModuleInfo>()
 
@@ -69,7 +69,7 @@ class FunctionReader(private val config: JsConfig, private val currentModuleName
 
         moduleNameMap = buildModuleNameMap(fragments)
 
-        JsLibraryUtils.traverseJsLibraries(libs) { fileContent, _ ->
+        JsLibraryUtils.traverseJsLibraries(libs) { fileContent, filePath ->
             var current = 0
 
             while (true) {
@@ -84,7 +84,7 @@ class FunctionReader(private val config: JsConfig, private val currentModuleName
                 val moduleName = preciseMatcher.group(3)
                 val moduleVariable = preciseMatcher.group(4)
                 val kotlinVariable = preciseMatcher.group(1)
-                moduleNameToInfo.put(moduleName, ModuleInfo(fileContent, moduleVariable, kotlinVariable))
+                moduleNameToInfo.put(moduleName, ModuleInfo(filePath, fileContent, moduleVariable, kotlinVariable))
             }
         }
     }
@@ -153,7 +153,7 @@ class FunctionReader(private val config: JsConfig, private val currentModuleName
             offset++
         }
 
-        val function = parseFunction(source, offset, ThrowExceptionOnErrorReporter, JsRootScope(JsProgram()))
+        val function = parseFunction(source, info.filePath, offset, ThrowExceptionOnErrorReporter, JsRootScope(JsProgram()))
         val moduleReference = moduleNameMap[tag] ?: currentModuleName.makeRef()
 
         val replacements = hashMapOf(info.moduleVariable to moduleReference,

@@ -32,15 +32,12 @@ public class JsAstMapper {
     private final JsProgram program;
     private final ScopeContext scopeContext;
 
-    @Nullable
-    private String fileName;
+    @NotNull
+    private final String fileName;
 
-    public JsAstMapper(@NotNull JsScope scope) {
+    public JsAstMapper(@NotNull JsScope scope, @NotNull String fileName) {
         scopeContext = new ScopeContext(scope);
         program = scope.getProgram();
-    }
-
-    public void setFileName(@Nullable String fileName) {
         this.fileName = fileName;
     }
 

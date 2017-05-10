@@ -59,8 +59,8 @@ fun JsNode.extractLocation(): JsLocation? {
 }
 
 fun JsLocation.asString(): String {
-    val simpleFileName = file?.substring(file!!.lastIndexOf("/") + 1)
-    return "${simpleFileName ?: "<unknown file>"}:${startLine + 1}"
+    val simpleFileName = file.substring(file.lastIndexOf("/") + 1)
+    return "$simpleFileName:${startLine + 1}"
 }
 
 fun Set<Node>.extractRoots(): Set<Node> {
