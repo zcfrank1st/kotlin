@@ -21,12 +21,11 @@ import com.intellij.openapi.util.Disposer;
 import kotlin.collections.ArraysKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.kotlin.cli.common.arguments.ArgumentParseErrors;
 import org.jetbrains.kotlin.cli.common.arguments.CommonCompilerArguments;
-import org.jetbrains.kotlin.cli.common.messages.FilteringMessageCollector;
 import org.jetbrains.kotlin.cli.common.messages.GroupingMessageCollector;
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector;
 import org.jetbrains.kotlin.cli.common.messages.MessageCollectorUtil;
+import org.jetbrains.kotlin.cli.common.messages.MessageRenderer;
 import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler;
 import org.jetbrains.kotlin.cli.jvm.compiler.CompilerJarLocator;
 import org.jetbrains.kotlin.config.*;
@@ -35,16 +34,29 @@ import org.jetbrains.kotlin.progress.CompilationCanceledStatus;
 import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStatus;
 import org.jetbrains.kotlin.utils.StringsKt;
 
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 import static org.jetbrains.kotlin.cli.common.ExitCode.*;
 import static org.jetbrains.kotlin.cli.common.environment.UtilKt.setIdeaIoUseFallback;
 import static org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.*;
 
 public abstract class CLICompiler<A extends CommonCompilerArguments> extends CLITool<A> {
+    // Used in CompilerRunnerUtil#invokeExecMethod, in Eclipse plugin (KotlinCLICompiler) and in kotlin-gradle-plugin (GradleCompilerRunner)
+    @NotNull
+    public ExitCode execAndOutputXml(@NotNull PrintStream errStream, @NotNull Services services, @NotNull String... args) {
+        return exec(errStream, services, MessageRenderer.XML, args);
+    }
+
+    // Used via reflection in KotlinCompilerBaseTask
+    @SuppressWarnings("UnusedDeclaration")
+    @NotNull
+    public ExitCode execFullPathsInMessages(@NotNull PrintStream errStream, @NotNull String[] args) {
+        return exec(errStream, Services.EMPTY, MessageRenderer.PLAIN_FULL_PATHS, args);
+    }
+
     @NotNull
     @Override
     public ExitCode execImpl(@NotNull MessageCollector messageCollector, @NotNull Services services, @NotNull A arguments) {

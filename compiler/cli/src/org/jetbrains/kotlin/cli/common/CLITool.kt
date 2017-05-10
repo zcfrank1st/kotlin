@@ -34,17 +34,7 @@ abstract class CLITool<A : CommonToolArguments> {
         return exec(errStream, Services.EMPTY, MessageRenderer.PLAIN_RELATIVE_PATHS, args)
     }
 
-    // Used in CompilerRunnerUtil#invokeExecMethod, in Eclipse plugin (KotlinCLICompiler) and in kotlin-gradle-plugin (GradleCompilerRunner)
-    fun execAndOutputXml(errStream: PrintStream, services: Services, vararg args: String): ExitCode {
-        return exec(errStream, services, MessageRenderer.XML, args)
-    }
-
-    // Used via reflection in KotlinCompilerBaseTask
-    fun execFullPathsInMessages(errStream: PrintStream, args: Array<String>): ExitCode {
-        return exec(errStream, Services.EMPTY, MessageRenderer.PLAIN_FULL_PATHS, args)
-    }
-
-    private fun exec(
+    protected fun exec(
             errStream: PrintStream,
             services: Services,
             messageRenderer: MessageRenderer,
