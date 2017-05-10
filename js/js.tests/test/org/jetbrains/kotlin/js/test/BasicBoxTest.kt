@@ -158,32 +158,33 @@ abstract class BasicBoxTest(
 
             performAdditionalChecks(generatedJsFiles.map { it.first }, outputPrefixFile, outputPostfixFile)
 
-            val minificationThresholdMatcher = MINIFICATION_THRESHOLD.matcher(fileContent)
-            val minificationThresholdFound = minificationThresholdMatcher.find()
+            val expectedReachableNodesMatcher = EXPECTED_REACHABLE_NODES.matcher(fileContent)
+            val expectedReachableNodesFound = expectedReachableNodesMatcher.find()
             val skipMinification = System.getProperty("kotlin.js.skipMinificationTest", "false").toBoolean()
             if (!skipMinification &&
-                (runMinifierByDefault || minificationThresholdFound) &&
+                (runMinifierByDefault || expectedReachableNodesFound) &&
                 !SKIP_MINIFICATION.matcher(fileContent).find()
             ) {
-                val thresholdChecker: (Int) -> Unit = if (!minificationThresholdFound) {
-                    ({ reachableNodesCount ->
-                        if (!System.getProperty("kotlin.js.generateThreshold", "false").toBoolean()) {
-                            fail("Minification threshold was not set. Reachable nodes: $reachableNodesCount")
+                val thresholdChecker: (Int) -> Unit = { reachableNodesCount ->
+                    val replacement = "// $EXPECTED_REACHABLE_NODES_DIRECTIVE: $reachableNodesCount"
+                    if (!expectedReachableNodesFound) {
+                        file.writeText("$replacement\n$fileContent")
+                        fail("The number of expected reachable nodes was not set. Actual reachable nodes: $reachableNodesCount")
+                    }
+                    else {
+                        val expectedReachableNodes = expectedReachableNodesMatcher.group(1).toInt()
+                        val minThreshold = expectedReachableNodes * 9 / 10
+                        val maxThreshold = expectedReachableNodes * 11 / 10
+                        if (reachableNodesCount < minThreshold || reachableNodesCount > maxThreshold) {
+
+                            val newText = fileContent.substring(0, expectedReachableNodesMatcher.start()) +
+                                          replacement +
+                                          fileContent.substring(expectedReachableNodesMatcher.end())
+                            file.writeText(newText)
+                            fail("Number of reachable nodes ($reachableNodesCount) does not fit into expected range " +
+                                 "[$minThreshold; $maxThreshold]")
                         }
-                        else {
-                            val suggestedThreshold = reachableNodesCount * 11 / 10
-                            val prefix = "// MINIFICATION_THRESHOLD: $suggestedThreshold\n"
-                            FileUtil.writeToFile(file, prefix + fileContent)
-                        }
-                    })
-                }
-                else {
-                    val threshold = minificationThresholdMatcher.group(1).toInt()
-                    ({ reachableNodesCount ->
-                        if (reachableNodesCount > threshold) {
-                            fail("DCE marked $reachableNodesCount as reachable, while threshold was $threshold")
-                        }
-                    })
+                    }
                 }
 
                 minifyAndRun(
@@ -567,7 +568,8 @@ abstract class BasicBoxTest(
         private val NO_INLINE_PATTERN = Pattern.compile("^// *NO_INLINE *$", Pattern.MULTILINE)
         private val SKIP_NODE_JS = Pattern.compile("^// *SKIP_NODE_JS *$", Pattern.MULTILINE)
         private val SKIP_MINIFICATION = Pattern.compile("^// *SKIP_MINIFICATION *$", Pattern.MULTILINE)
-        private val MINIFICATION_THRESHOLD = Pattern.compile("^// *MINIFICATION_THRESHOLD: *([0-9]+) *$", Pattern.MULTILINE)
+        private val EXPECTED_REACHABLE_NODES_DIRECTIVE = "EXPECTED_REACHABLE_NODES"
+        private val EXPECTED_REACHABLE_NODES = Pattern.compile("^// *$EXPECTED_REACHABLE_NODES_DIRECTIVE: *([0-9]+) *$", Pattern.MULTILINE)
         private val RECOMPILE_PATTERN = Pattern.compile("^// *RECOMPILE *$", Pattern.MULTILINE)
         private val AST_EXTENSION = "jsast"
         private val METADATA_EXTENSION = "jsmeta"
