@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 614
+// EXPECTED_REACHABLE_NODES: 559
 package foo
 
 class undefined

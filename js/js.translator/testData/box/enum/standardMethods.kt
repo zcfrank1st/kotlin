@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 1035
+// EXPECTED_REACHABLE_NODES: 941
 package foo
 
 enum class EmptyEnum

@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 544
+// EXPECTED_REACHABLE_NODES: 495
 // CHECK_CONTAINS_NO_CALLS: box except=equals;Baz_getInstance;callLocal;callLocalExtension
 // CHECK_CONTAINS_NO_CALLS: callLocal
 // CHECK_CONTAINS_NO_CALLS: callLocalExtension

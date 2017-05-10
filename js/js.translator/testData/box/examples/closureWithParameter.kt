@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 537
+// EXPECTED_REACHABLE_NODES: 489
 fun box(): String {
     return apply("OK", { arg: String -> arg })
 }

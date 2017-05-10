@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 544
+// EXPECTED_REACHABLE_NODES: 495
 // Order of evaluation differs for JVM and Javascript backend
 // http://youtrack.jetbrains.com/issue/KT-5254
 

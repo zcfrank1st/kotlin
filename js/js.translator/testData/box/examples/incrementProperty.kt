@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 540
+// EXPECTED_REACHABLE_NODES: 491
 class Slot() {
     var vitality: Int = 10000
 

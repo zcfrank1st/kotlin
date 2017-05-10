@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 550
+// EXPECTED_REACHABLE_NODES: 500
 package foo
 
 class A(val value: Int) : Comparable<A> {

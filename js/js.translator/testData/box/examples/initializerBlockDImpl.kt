@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 979
+// EXPECTED_REACHABLE_NODES: 890
 
 class World() {
     public val items: ArrayList<Item> = ArrayList<Item>()

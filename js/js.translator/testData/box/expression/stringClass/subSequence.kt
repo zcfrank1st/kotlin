@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 550
+// EXPECTED_REACHABLE_NODES: 500
 package foo
 
 class CC(val s: CharSequence) : CharSequence by s, MyCharSequence {}

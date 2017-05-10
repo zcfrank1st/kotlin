@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 554
+// EXPECTED_REACHABLE_NODES: 504
 // MODULE: main(module2)
 // FILE: main.kt
 

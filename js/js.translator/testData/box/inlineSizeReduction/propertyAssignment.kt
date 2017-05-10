@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 545
+// EXPECTED_REACHABLE_NODES: 496
 package foo
 
 // CHECK_CONTAINS_NO_CALLS: test except=SumHolder_getInstance

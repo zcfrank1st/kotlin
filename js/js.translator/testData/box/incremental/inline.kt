@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 535
+// EXPECTED_REACHABLE_NODES: 487
 // FILE: a.kt
 
 private inline fun bar(f: () -> String): String = "bar(${f()})"

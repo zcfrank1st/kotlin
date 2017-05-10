@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 565
+// EXPECTED_REACHABLE_NODES: 514
 /*
  * Copy of JVM-backend test
  * Found at: compiler/testData/codegen/boxInline/tryCatchFinally/tryCatch.1.kt

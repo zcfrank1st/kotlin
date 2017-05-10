@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 556
+// EXPECTED_REACHABLE_NODES: 506
 external open class A
 
 interface I

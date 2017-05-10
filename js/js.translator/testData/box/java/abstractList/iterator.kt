@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 666
+// EXPECTED_REACHABLE_NODES: 606
 package foo
 
 class MyList<T>(vararg val data: T) : AbstractList<T>() {

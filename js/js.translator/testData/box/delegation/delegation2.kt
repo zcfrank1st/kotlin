@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 554
+// EXPECTED_REACHABLE_NODES: 504
 // This test was adapted from compiler/testData/codegen/box/classes
 package foo
 

@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 542
+// EXPECTED_REACHABLE_NODES: 493
 interface I
 
 class MyException: Exception(), I

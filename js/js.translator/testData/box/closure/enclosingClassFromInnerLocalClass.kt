@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 570
+// EXPECTED_REACHABLE_NODES: 519
 package foo
 
 open class X(private val x: String) {

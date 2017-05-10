@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 537
+// EXPECTED_REACHABLE_NODES: 489
 package foo
 
 operator fun Int.component1(): Int {

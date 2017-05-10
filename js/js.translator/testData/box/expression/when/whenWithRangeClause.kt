@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 540
+// EXPECTED_REACHABLE_NODES: 491
 // see KT-7683
 // WhenTranslator must recognize KtWhenConditionInRange and produce faster code when matched expression is Int
 package foo

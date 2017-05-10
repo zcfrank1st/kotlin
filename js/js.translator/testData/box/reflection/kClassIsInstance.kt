@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 617
+// EXPECTED_REACHABLE_NODES: 561
 package foo
 
 import kotlin.reflect.KClass

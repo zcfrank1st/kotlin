@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 544
+// EXPECTED_REACHABLE_NODES: 495
 interface I {
     val foo: String
         get() = "OK"

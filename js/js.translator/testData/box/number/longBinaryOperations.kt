@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 542
+// EXPECTED_REACHABLE_NODES: 493
 package foo
 
 fun fact(n: Int): Long = if (n == 1) 1L else n * fact(n - 1)

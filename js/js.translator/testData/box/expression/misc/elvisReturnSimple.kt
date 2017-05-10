@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 542
+// EXPECTED_REACHABLE_NODES: 493
 /*
  * Issue: KT-4159 Kotlin to JS compiler crashes on code with ?: return
  *

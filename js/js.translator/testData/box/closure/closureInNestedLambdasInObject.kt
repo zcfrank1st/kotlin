@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 547
+// EXPECTED_REACHABLE_NODES: 498
 // KT-4218 Nested function literal on singleton object fails
 
 package foo

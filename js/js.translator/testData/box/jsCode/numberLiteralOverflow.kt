@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 535
+// EXPECTED_REACHABLE_NODES: 487
 fun box(): String {
     val a = js("0xff000000")
     if (a != 4278190080.0) return "fail1: $a"

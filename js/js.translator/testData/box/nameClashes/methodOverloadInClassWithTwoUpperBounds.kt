@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 563
+// EXPECTED_REACHABLE_NODES: 512
 package foo
 
 interface TraitA

@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 579
+// EXPECTED_REACHABLE_NODES: 527
 package foo
 
 // CHECK_LABELS_COUNT: function=test name=loop count=1

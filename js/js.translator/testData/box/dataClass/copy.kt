@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 546
+// EXPECTED_REACHABLE_NODES: 497
 package foo
 
 data class Dat(val start: String, val middle: String, val end: String)

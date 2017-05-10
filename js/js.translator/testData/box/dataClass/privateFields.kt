@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 1048
+// EXPECTED_REACHABLE_NODES: 953
 package foo
 
 data class A(private val x: Int) {

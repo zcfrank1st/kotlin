@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 556
+// EXPECTED_REACHABLE_NODES: 506
 // This test was adapted from compiler/testData/codegen/box/callableReference/property/.
 package foo
 

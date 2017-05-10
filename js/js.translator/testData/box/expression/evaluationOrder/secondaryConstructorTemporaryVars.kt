@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 542
+// EXPECTED_REACHABLE_NODES: 493
 // HAS_NO_CAPTURED_VARS: function=A_init except=Kotlin;A
 
 class A() {

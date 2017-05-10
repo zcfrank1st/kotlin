@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 674
+// EXPECTED_REACHABLE_NODES: 613
 package foo
 
 class SimpleEnumerator {

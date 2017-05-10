@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 542
+// EXPECTED_REACHABLE_NODES: 493
 package foo
 
 // CHECK_FUNCTIONS_HAVE_SAME_LINES: declaredBefore declaredAfter match=(h|g)1 replace=$1

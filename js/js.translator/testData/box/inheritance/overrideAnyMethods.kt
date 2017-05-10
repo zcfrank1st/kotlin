@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 547
+// EXPECTED_REACHABLE_NODES: 498
 package foo
 
 inline fun String.charCodeAt(i: Int): Int = asDynamic().charCodeAt(i)

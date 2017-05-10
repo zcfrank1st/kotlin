@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 591
+// EXPECTED_REACHABLE_NODES: 538
 package foo
 
 enum class A {

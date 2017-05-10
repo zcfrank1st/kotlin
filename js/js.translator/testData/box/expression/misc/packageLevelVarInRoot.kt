@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 537
+// EXPECTED_REACHABLE_NODES: 489
 var c = 2
 
 fun incC(i: Int) {

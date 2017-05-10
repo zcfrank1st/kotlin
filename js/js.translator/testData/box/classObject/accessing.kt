@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 551
+// EXPECTED_REACHABLE_NODES: 501
 // KT-4130 object fields are not evaluated correctly
 
 package foo

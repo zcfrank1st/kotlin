@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 601
+// EXPECTED_REACHABLE_NODES: 547
 package foo
 
 import kotlin.reflect.KProperty

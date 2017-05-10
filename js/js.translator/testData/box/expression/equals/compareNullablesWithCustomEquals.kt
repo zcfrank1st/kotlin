@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 576
+// EXPECTED_REACHABLE_NODES: 524
 package foo
 
 class A {

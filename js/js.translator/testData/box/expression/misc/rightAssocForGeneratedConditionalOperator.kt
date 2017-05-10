@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 541
+// EXPECTED_REACHABLE_NODES: 492
 // http://youtrack.jetbrains.com/issue/KT-5320
 // KT-5320 Invalid JS code generated for typecast inside ternary operator
 

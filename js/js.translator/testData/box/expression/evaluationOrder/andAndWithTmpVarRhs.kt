@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 983
+// EXPECTED_REACHABLE_NODES: 894
 fun foo(arg: Any): Boolean {
     return arg == "x"
 }

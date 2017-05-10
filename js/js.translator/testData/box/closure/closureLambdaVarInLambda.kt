@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 544
+// EXPECTED_REACHABLE_NODES: 495
 // KT-4263 Wrong capturing a function literal variable
 
 package foo

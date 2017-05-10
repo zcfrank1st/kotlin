@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 559
+// EXPECTED_REACHABLE_NODES: 509
 // http://youtrack.jetbrains.com/issue/KT-4879
 // JS: extra side effect when use when in default arguments
 

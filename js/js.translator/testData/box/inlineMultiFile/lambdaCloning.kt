@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 541
+// EXPECTED_REACHABLE_NODES: 492
 /*
  * Copy of JVM-backend test
  * Found at: compiler/testData/codegen/boxInline/lambdaTransformation/lambdaCloning.1.kt

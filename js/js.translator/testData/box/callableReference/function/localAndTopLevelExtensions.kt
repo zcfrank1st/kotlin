@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 540
+// EXPECTED_REACHABLE_NODES: 491
 package foo
 
 fun Int.sum0(other: Int): Int = this + other

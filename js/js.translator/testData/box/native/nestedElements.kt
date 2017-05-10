@@ -1,5 +1,4 @@
-// SKIP_MINIFICATION
-// For some reason does not work in Rhino (though works in browser)
+// EXPECTED_REACHABLE_NODES: 519
 package foo
 
 fun box(): String {

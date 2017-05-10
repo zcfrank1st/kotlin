@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 546
+// EXPECTED_REACHABLE_NODES: 497
 // CHECK_VARS_COUNT: function=test1 count=0
 // CHECK_VARS_COUNT: function=test2 count=1
 // CHECK_VARS_COUNT: function=test3 count=0

@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 535
+// EXPECTED_REACHABLE_NODES: 487
 package foo
 
 annotation class bar

@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 573
+// EXPECTED_REACHABLE_NODES: 521
 /*
  * Copy of JVM-backend test
  * Found at: compiler/testData/codegen/boxInline/simple/simpleEnum.1.kt

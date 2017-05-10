@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 545
+// EXPECTED_REACHABLE_NODES: 496
 // MODULE: lib
 // FILE: lib.kt
 package lib

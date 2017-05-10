@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 556
+// EXPECTED_REACHABLE_NODES: 506
 open class Base() {
     val plain = 239
     public val read: Int

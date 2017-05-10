@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 551
+// EXPECTED_REACHABLE_NODES: 501
 package foo
 
 class A(val x: Int) {

@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 548
+// EXPECTED_REACHABLE_NODES: 499
 open class Foo() {
     fun xyzzy(): String = "xyzzy"
 }

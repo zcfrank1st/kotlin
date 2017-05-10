@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 605
+// EXPECTED_REACHABLE_NODES: 550
 package foo
 
 inline fun <reified T : Any> foo(): () -> JsClass<T> {

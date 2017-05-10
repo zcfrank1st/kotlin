@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 542
+// EXPECTED_REACHABLE_NODES: 493
 package foo
 
 fun <A, B, C> run(a: A, b: B, func: (A, B) -> C): C = js("func(a, b)")

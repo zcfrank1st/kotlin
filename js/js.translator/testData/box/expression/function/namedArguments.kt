@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 536
+// EXPECTED_REACHABLE_NODES: 488
 package foo
 
 fun test(x: Int, y: Int) = y - x

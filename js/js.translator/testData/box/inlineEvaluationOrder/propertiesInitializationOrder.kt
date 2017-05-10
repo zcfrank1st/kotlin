@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 546
+// EXPECTED_REACHABLE_NODES: 497
 package foo
 
 class A(val x: Int = fizz(1) + 1) {

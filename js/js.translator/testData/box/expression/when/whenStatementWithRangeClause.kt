@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 536
+// EXPECTED_REACHABLE_NODES: 488
 // see KT-7683
 // WhenTranslator must recognize KtWhenConditionInRange for when statement
 package foo

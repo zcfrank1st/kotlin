@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 979
+// EXPECTED_REACHABLE_NODES: 890
 public fun <T, C : Collection<T>> bar(collection: C, f: (T) -> Unit) { for (item in collection) f(item) }
 
 fun box(): String {

@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 542
+// EXPECTED_REACHABLE_NODES: 493
 class Greeting {
     val noon = xrun {
         verb = "Hello"

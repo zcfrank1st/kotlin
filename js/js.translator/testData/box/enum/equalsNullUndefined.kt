@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 581
+// EXPECTED_REACHABLE_NODES: 529
 enum class A {
     X,
     Y

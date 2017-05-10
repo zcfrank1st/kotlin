@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 537
+// EXPECTED_REACHABLE_NODES: 489
 package foo
 
 fun bigValue() = 0x7FFFFFFC

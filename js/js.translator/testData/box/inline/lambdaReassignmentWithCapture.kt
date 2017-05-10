@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 554
+// EXPECTED_REACHABLE_NODES: 504
 package foo
 
 data class IntPair(public var fst: Int, public var snd: Int)

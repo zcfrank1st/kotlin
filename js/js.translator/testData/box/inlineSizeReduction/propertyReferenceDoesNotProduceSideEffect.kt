@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 545
+// EXPECTED_REACHABLE_NODES: 496
 // CHECK_VARS_COUNT: function=box count=1
 
 package foo

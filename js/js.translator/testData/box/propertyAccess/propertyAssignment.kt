@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 546
+// EXPECTED_REACHABLE_NODES: 497
 // See https://youtrack.jetbrains.com/issue/KT-10785
 package foo
 

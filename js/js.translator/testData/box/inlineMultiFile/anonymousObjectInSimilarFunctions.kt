@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 546
+// EXPECTED_REACHABLE_NODES: 497
 // FILE: a.kt
 
 inline fun foo(x: String): I = object : I {

@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 536
+// EXPECTED_REACHABLE_NODES: 488
 external interface I {
     fun foo(): String
 }

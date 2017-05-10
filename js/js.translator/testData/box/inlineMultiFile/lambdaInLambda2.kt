@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 543
+// EXPECTED_REACHABLE_NODES: 494
 /*
  * Copy of JVM-backend test
  * Found at: compiler/testData/codegen/boxInline/lambdaTransformation/lambdaInLambda2.1.kt

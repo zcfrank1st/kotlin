@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 551
+// EXPECTED_REACHABLE_NODES: 501
 /*
  * Copy of JVM-backend test
  * Found at: compiler/testData/codegen/boxInline/simple/classObject.1.kt

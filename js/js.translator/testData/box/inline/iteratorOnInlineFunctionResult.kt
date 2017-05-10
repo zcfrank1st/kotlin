@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 665
+// EXPECTED_REACHABLE_NODES: 605
 package foo
 
 inline fun bar(f: () -> Int): Array<Int> = arrayOf(f())

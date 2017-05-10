@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 985
+// EXPECTED_REACHABLE_NODES: 896
 package foo
 
 var global = ""

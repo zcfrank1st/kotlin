@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 546
+// EXPECTED_REACHABLE_NODES: 497
 package foo
 
 fun sum(a: Int, b: Int, c: Int, d: Int): Int {

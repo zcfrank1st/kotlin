@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 1008
+// EXPECTED_REACHABLE_NODES: 917
 package foo
 
 object EmptyObject {}

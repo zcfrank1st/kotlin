@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 536
+// EXPECTED_REACHABLE_NODES: 488
 package foo
 
 operator fun Int.invoke(x: Int) = this + x

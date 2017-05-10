@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 542
+// EXPECTED_REACHABLE_NODES: 493
 // see KT-7683
 // WhenTranslator must recognize KtWhenConditionInRange in general case of a class that has rangeTo method
 package foo

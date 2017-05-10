@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 995
+// EXPECTED_REACHABLE_NODES: 905
 
 interface Tr {
     fun extra(): String = "_"

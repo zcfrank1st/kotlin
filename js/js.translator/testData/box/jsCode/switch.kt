@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 541
+// EXPECTED_REACHABLE_NODES: 492
 package foo
 
 fun testSwitch(number: Int): String = js("""

@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 547
+// EXPECTED_REACHABLE_NODES: 498
 // FILE: a.kt
 @file:JsModule("lib")
 @file:JsNonModule

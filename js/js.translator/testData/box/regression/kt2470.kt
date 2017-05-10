@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 542
+// EXPECTED_REACHABLE_NODES: 493
 // KT-2470 another name mangling bug: kotlin.test.failsWith() gets generated to invalid JS
 
 package foo

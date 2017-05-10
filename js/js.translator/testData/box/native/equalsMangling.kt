@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 546
+// EXPECTED_REACHABLE_NODES: 497
 data class A(val number: Int)
 
 external fun foo(first: A, second: A): Boolean

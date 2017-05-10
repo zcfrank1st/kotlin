@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 536
+// EXPECTED_REACHABLE_NODES: 488
 /*
  * Copy of JVM-backend test
  * Found at: compiler/testData/codegen/boxInline/defaultValues/inlineInDefaultParameter.1.kt

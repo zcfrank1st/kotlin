@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 544
+// EXPECTED_REACHABLE_NODES: 495
 package foo
 
 // For now, check is Byte(is Short, is Int is Float, is Double) translates to typeof ... == "number"

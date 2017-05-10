@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 594
+// EXPECTED_REACHABLE_NODES: 540
 package foo
 
 public class PublicClass {

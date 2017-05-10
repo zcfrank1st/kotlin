@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 607
+// EXPECTED_REACHABLE_NODES: 552
 package foo
 
 fun box(): String {

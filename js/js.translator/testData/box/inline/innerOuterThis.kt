@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 542
+// EXPECTED_REACHABLE_NODES: 493
 package foo
 
 inline fun<T> with1(value: T, p: T.() -> Unit) = value.p()

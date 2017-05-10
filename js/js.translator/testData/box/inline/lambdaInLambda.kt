@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 542
+// EXPECTED_REACHABLE_NODES: 493
 package foo
 
 // CHECK_CALLED_IN_SCOPE: scope=multiplyBy2 function=multiplyBy2$lambda

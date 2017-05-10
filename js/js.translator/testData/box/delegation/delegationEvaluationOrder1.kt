@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 566
+// EXPECTED_REACHABLE_NODES: 515
 package foo
 
 interface Base {

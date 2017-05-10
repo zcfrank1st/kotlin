@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 564
+// EXPECTED_REACHABLE_NODES: 513
 package foo
 
 open class A

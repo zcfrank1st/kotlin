@@ -1,4 +1,4 @@
-// MINIFICATION_THRESHOLD: 943
+// EXPECTED_REACHABLE_NODES: 858
 package foo
 
 data class Holder<T>(val v: T)
