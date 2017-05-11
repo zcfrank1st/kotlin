@@ -35,7 +35,8 @@ inline fun <T> fillArrayFun(array: Array<T>, init: (Int) -> T): Array<T> {
 
 @JsName("booleanArray")
 fun booleanArray(size: Int, init: dynamic): Array<Boolean> {
-    val result = newBooleanArray(size)
+    val result: dynamic = Array<Boolean>(size)
+    result.`$type$` = "BooleanArray"
     return when (init) {
         null, true -> fillArrayVal(result, false)
         false -> result
@@ -44,7 +45,7 @@ fun booleanArray(size: Int, init: dynamic): Array<Boolean> {
 }
 
 @JsName("booleanArrayF")
-inline fun booleanArrayWithFun(size: Int, init: (Int) -> Boolean) = fillArrayFun(newBooleanArray(size), init)
+inline fun booleanArrayWithFun(size: Int, init: (Int) -> Boolean): Array<Boolean> = fillArrayFun(booleanArray(size, false), init)
 
 @JsName("charArray")
 @Suppress("UNUSED_PARAMETER")
@@ -58,11 +59,12 @@ fun charArray(size: Int, init: dynamic): Array<Char> {
 }
 
 @JsName("charArrayF")
-inline fun charArrayWithFun(size: Int, init: (Int) -> Char) = fillArrayFun(charArray(size, null), init)
+inline fun charArrayWithFun(size: Int, init: (Int) -> Char): Array<Char> = fillArrayFun(charArray(size, null), init)
 
 @JsName("longArray")
 fun longArray(size: Int, init: dynamic): Array<Long> {
-    val result = newLongArray(size)
+    val result: dynamic = Array<Long>(size)
+    result.`$type$` = "LongArray"
     return when (init) {
         null, true -> fillArrayVal(result, 0L)
         false -> result
@@ -71,19 +73,7 @@ fun longArray(size: Int, init: dynamic): Array<Long> {
 }
 
 @JsName("longArrayF")
-inline fun longArrayWithFun(size: Int, init: (Int) -> Boolean) = fillArrayFun(newLongArray(size), init)
-
-inline fun newBooleanArray(size: Int): dynamic {
-    val result: dynamic = Array<Boolean>(size)
-    result.`$type$` = "BooleanArray"
-    return result
-}
-
-inline fun newLongArray(size: Int): dynamic {
-    val result: dynamic = Array<Long>(size)
-    result.`$type$` = "LongArray"
-    return result
-}
+inline fun longArrayWithFun(size: Int, init: (Int) -> Long): Array<Long> = fillArrayFun(longArray(size, false), init)
 
 private fun <T> fillArrayVal(array: Array<T>, initValue: T): Array<T> {
     for (i in 0..array.size - 1) {
