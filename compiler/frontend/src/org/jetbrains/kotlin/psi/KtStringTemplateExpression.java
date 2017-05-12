@@ -20,8 +20,10 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.ElementManipulators;
 import com.intellij.psi.LiteralTextEscaper;
 import com.intellij.psi.PsiLanguageInjectionHost;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.kotlin.KtNodeTypes;
 import org.jetbrains.kotlin.lexer.KtTokens;
 
 public class KtStringTemplateExpression extends KtExpressionImpl implements PsiLanguageInjectionHost {
@@ -57,5 +59,19 @@ public class KtStringTemplateExpression extends KtExpressionImpl implements PsiL
     @Override
     public LiteralTextEscaper<? extends PsiLanguageInjectionHost> createLiteralTextEscaper() {
         return new KotlinStringLiteralTextEscaper(this);
+    }
+
+    public boolean hasInterpolation() {
+        ASTNode node = getNode();
+        ASTNode child = node.getFirstChildNode().getTreeNext();
+        while (child != null) {
+            IElementType elementType = child.getElementType();
+            if (elementType == KtTokens.CLOSING_QUOTE) return false;
+            if (elementType == KtNodeTypes.SHORT_STRING_TEMPLATE_ENTRY || elementType == KtNodeTypes.LONG_STRING_TEMPLATE_ENTRY) {
+                return true;
+            }
+            child = child.getTreeNext();
+        }
+        return false;
     }
 }
