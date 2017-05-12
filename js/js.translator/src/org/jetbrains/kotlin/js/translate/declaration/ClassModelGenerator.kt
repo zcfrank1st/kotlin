@@ -35,6 +35,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.hasOrInheritsParametersWithDe
 import org.jetbrains.kotlin.resolve.descriptorUtil.hasOwnParametersWithDefaultValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
+import org.jetbrains.kotlin.resolve.source.getPsi
 import org.jetbrains.kotlin.utils.identity
 
 class ClassModelGenerator(val context: StaticContext) {
@@ -192,7 +193,8 @@ class ClassModelGenerator(val context: StaticContext) {
             val sourceName = context.getNameForDescriptor(key).ident
             val targetName = context.getNameForDescriptor(value).ident
             if (sourceName != targetName) {
-                model.postDeclarationBlock.statements += generateDelegateCall(descriptor, key, value, JsThisRef(), translationContext)
+                model.postDeclarationBlock.statements += generateDelegateCall(descriptor, key, value, JsThisRef(), translationContext,
+                                                                              descriptor.source.getPsi())
             }
         }
     }
@@ -228,7 +230,7 @@ class ClassModelGenerator(val context: StaticContext) {
 
         val translationContext = TranslationContext.rootContext(context)
         model.postDeclarationBlock.statements += generateDelegateCall(descriptor, fromDescriptor, toDescriptor, JsThisRef(),
-                                                                      translationContext)
+                                                                      translationContext, descriptor.source.getPsi())
     }
 
     private fun copyMethod(

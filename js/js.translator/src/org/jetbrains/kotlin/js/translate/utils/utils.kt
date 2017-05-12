@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.js.translate.utils
 
+import com.intellij.psi.PsiElement
 import com.intellij.util.SmartList
 import org.jetbrains.kotlin.backend.common.COROUTINES_INTRINSICS_PACKAGE_FQ_NAME
 import org.jetbrains.kotlin.backend.common.COROUTINE_SUSPENDED_NAME
@@ -43,7 +44,8 @@ fun generateDelegateCall(
         fromDescriptor: FunctionDescriptor,
         toDescriptor: FunctionDescriptor,
         thisObject: JsExpression,
-        context: TranslationContext
+        context: TranslationContext,
+        source: PsiElement?
 ): JsStatement {
     val overriddenMemberFunctionName = context.getNameForDescriptor(toDescriptor)
     val overriddenMemberFunctionRef = JsNameRef(overriddenMemberFunctionName, thisObject)
@@ -71,6 +73,8 @@ fun generateDelegateCall(
     else {
         JsInvocation(overriddenMemberFunctionRef, args)
     }
+
+    invocation.source = source
 
     val functionObject = simpleReturnFunction(context.getScopeForDescriptor(fromDescriptor), invocation)
     functionObject.parameters.addAll(parameters)
