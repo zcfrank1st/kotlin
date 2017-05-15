@@ -155,7 +155,8 @@ public final class FunctionBodyTranslator extends AbstractTranslator {
                 node = JsAstUtils.charToBoxedChar((JsExpression) node);
             }
 
-            JsReturn jsReturn = new JsReturn((JsExpression)node);
+            JsReturn jsReturn = new JsReturn((JsExpression) node);
+            jsReturn.setSource(declaration);
             MetadataProperties.setReturnTarget(jsReturn, descriptor);
             return jsReturn;
         });
