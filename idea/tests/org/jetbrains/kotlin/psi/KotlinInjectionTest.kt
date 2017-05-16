@@ -324,4 +324,19 @@ class KotlinInjectionTest : AbstractInjectionTest() {
             """,
             languageId = HTMLLanguage.INSTANCE.id, unInjectShouldBePresent = false
     )
+
+    fun testInjectionOnInterpolationWithAnnotation() = doInjectionPresentTest(
+            """
+            val a = 1
+            val b = 2
+
+            @org.intellij.lang.annotations.Language("HTML")
+            val test = "<caret>simple${'$'}a${'$'}{b}.kt"
+            """,
+            unInjectShouldBePresent = false,
+            shreds = listOf(
+                    ShredInfo(range(0,6), hostRange=range(1, 7)),
+                    ShredInfo(range(6,22), hostRange=range(13, 16), prefix="amissingValue")
+            )
+    )
 }
