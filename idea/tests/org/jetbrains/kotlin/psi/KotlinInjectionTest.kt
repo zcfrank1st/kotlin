@@ -339,4 +339,16 @@ class KotlinInjectionTest : AbstractInjectionTest() {
                     ShredInfo(range(6,22), hostRange=range(13, 16), prefix="amissingValue")
             )
     )
+
+    fun testInjectionOnInterpolatedStringWithComment() = doInjectionPresentTest(
+            """
+            val some = 42
+            // language=HTML
+            val test = "<ht<caret>ml>${'$'}some</html>"
+            """,
+            languageId = HTMLLanguage.INSTANCE.id, unInjectShouldBePresent = false,
+            shreds = listOf(
+                    ShredInfo(range(0, 6), hostRange = range(1, 7)),
+                    ShredInfo(range(6, 17), hostRange = range(12, 19), prefix="some"))
+    )
 }
