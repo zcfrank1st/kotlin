@@ -473,7 +473,7 @@ abstract class BasicBoxTest(
         runList += kotlinJsLibOutput
         runList += kotlinTestJsLibOutput
         runList += TEST_DATA_DIR_PATH + "nashorn-polyfills.js"
-        runList += allJsFiles.map { filesToMinify[it]?.outputName ?: it }
+        runList += allJsFiles.map { filesToMinify[it]?.outputPath ?: it }
 
         val result = engineForMinifier.runAndRestoreContext {
             runList.forEach(this::loadFile)
