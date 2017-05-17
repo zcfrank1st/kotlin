@@ -16,17 +16,16 @@
 
 package org.jetbrains.kotlin.idea.injection
 
-import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.Trinity
-import com.intellij.openapi.util.text.StringUtil
-import com.intellij.psi.ElementManipulators
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLanguageInjectionHost
 import org.intellij.plugins.intelliLang.inject.InjectedLanguage
 import org.intellij.plugins.intelliLang.inject.InjectorUtils
 import org.intellij.plugins.intelliLang.inject.config.BaseInjection
 import org.jetbrains.kotlin.KtNodeTypes
-import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.KtSimpleNameStringTemplateEntry
+import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import java.util.*
 
 data class InjectionSplitResult(val isUnparsable: Boolean, val ranges: List<Trinity<PsiLanguageInjectionHost, InjectedLanguage, TextRange>>)
@@ -34,100 +33,78 @@ data class InjectionSplitResult(val isUnparsable: Boolean, val ranges: List<Trin
 fun splitLiteralToInjectionParts(injection: BaseInjection, literal: KtStringTemplateExpression): InjectionSplitResult? {
     InjectorUtils.getLanguage(injection) ?: return null
 
-    val unparsableRef = Ref.create(false)
-    val parts = collectParts(literal, injection.prefix, injection.suffix, unparsableRef)
-    if (parts.isEmpty()) return null
+    val children = literal.children
+    val len = children.size
+
+    if (children.isEmpty()) return null
 
     val result = ArrayList<Trinity<PsiLanguageInjectionHost, InjectedLanguage, TextRange>>()
-    val len = parts.size
+
+    fun addInjectionRange(range: TextRange, prefix: String, suffix: String) {
+        TextRange.assertProperRange(range, injection)
+        val injectedLanguage = InjectedLanguage.create(injection.injectedLanguageId, prefix, suffix, true)!!
+        result.add(Trinity.create(literal, injectedLanguage, range))
+    }
+
+    var unparsable = false
+
+    var prefix = injection.prefix
+    val lastChild = children.lastOrNull()
 
     var i = 0
     while (i < len) {
-        var curPrefix: String? = null
-        var o = parts[i]
-        if (o is String) {
-            curPrefix = o
-            if (i == len - 1) return null
-            o = parts[++i]
+        val child = children[i]
+        val partOffsetInParent = child.startOffsetInParent
+
+        val part = when (child.node.elementType) {
+            KtNodeTypes.LITERAL_STRING_TEMPLATE_ENTRY, KtNodeTypes.ESCAPE_STRING_TEMPLATE_ENTRY -> {
+                var lastInPart = child
+                while (i + 1 < len) {
+                    val nextChild = children[i + 1]
+                    val nextType = nextChild.node.elementType
+                    if (nextType == KtNodeTypes.LITERAL_STRING_TEMPLATE_ENTRY || nextType == KtNodeTypes.ESCAPE_STRING_TEMPLATE_ENTRY) {
+                        lastInPart = nextChild
+                        i++
+                    }
+                    else {
+                        break
+                    }
+                }
+                lastInPart
+            }
+            KtNodeTypes.SHORT_STRING_TEMPLATE_ENTRY -> {
+                unparsable = true
+                (child as KtSimpleNameStringTemplateEntry).expression?.text ?: NO_VALUE_NAME
+            }
+            KtNodeTypes.LONG_STRING_TEMPLATE_ENTRY -> {
+                unparsable = true
+                NO_VALUE_NAME
+            }
+            else -> {
+                unparsable = true
+                child
+            }
         }
 
-        var curSuffix: String? = null
-        var curHost: KtStringTemplateEntry? = null
-        if (o is KtLiteralStringTemplateEntry || o is KtEscapeStringTemplateEntry) {
-            curHost = o as KtStringTemplateEntry
-            if (i == len - 2) {
-                val next = parts[i + 1]
-                if (next is String) {
-                    i++
-                    curSuffix = next
-                }
-            }
+        val suffix = if (child == lastChild) injection.suffix else ""
+
+        if (part is PsiElement) {
+            addInjectionRange(TextRange.create(partOffsetInParent, part.startOffsetInParent + part.textLength), prefix, suffix)
         }
-        if (curHost == null) {
-            unparsableRef.set(java.lang.Boolean.TRUE)
+        else if (!prefix.isEmpty() || i == 0) {
+            addInjectionRange(TextRange.from(partOffsetInParent, 0), prefix, suffix)
         }
-        else {
-            if (curHost !is KtLiteralStringTemplateEntry && curHost !is KtEscapeStringTemplateEntry) {
-                val textRange = ElementManipulators.getManipulator(curHost).getRangeInElement(curHost)
-                TextRange.assertProperRange(textRange, injection)
-                val injectedLanguage = InjectedLanguage.create(injection.injectedLanguageId, curPrefix, curSuffix, true)!!
-                result.add(Trinity.create(literal, injectedLanguage, textRange))
-            }
-            else {
-                val textRange = TextRange.from(curHost.startOffsetInParent, curHost.textLength)
-                TextRange.assertProperRange(textRange, injection)
-                val injectedLanguage = InjectedLanguage.create(injection.injectedLanguageId, curPrefix, curSuffix, true)!!
-                result.add(Trinity.create(literal, injectedLanguage, textRange))
-            }
-        }
+
+        prefix = part as? String ?: ""
         i++
     }
 
-    return InjectionSplitResult(unparsableRef.get(), result)
-}
+    if (lastChild != null && !prefix.isEmpty()) {
+        // Last element was interpolated part, need to add a range after it
+        addInjectionRange(TextRange.from(lastChild.startOffsetInParent + lastChild.textLength, 0), prefix, injection.suffix)
+    }
 
-private fun collectParts(literal: KtStringTemplateExpression, prefix: String, suffix: String, unparsable: Ref<Boolean>): List<Any> {
-    val result = ArrayList<Any>()
-    addStringFragment(prefix, result)
-    collectParts(literal, result, unparsable)
-    addStringFragment(suffix, result)
-    return result
+    return InjectionSplitResult(unparsable, result)
 }
 
 private val NO_VALUE_NAME = "missingValue"
-
-private fun collectParts(literal: KtStringTemplateExpression, result: MutableList<Any>, unparsable: Ref<Boolean>) {
-    val children = literal.children
-    for (child in children) {
-        when (child.node.elementType) {
-            KtNodeTypes.LITERAL_STRING_TEMPLATE_ENTRY, KtNodeTypes.ESCAPE_STRING_TEMPLATE_ENTRY -> {
-                result.add(child)
-            }
-
-            KtNodeTypes.SHORT_STRING_TEMPLATE_ENTRY -> {
-                val valueName = (child as KtSimpleNameStringTemplateEntry).expression?.text ?: NO_VALUE_NAME
-                addStringFragment(valueName, result)
-            }
-            KtNodeTypes.LONG_STRING_TEMPLATE_ENTRY -> {
-                unparsable.set(java.lang.Boolean.TRUE)
-                addStringFragment(NO_VALUE_NAME, result)
-            }
-            else -> {
-                unparsable.set(java.lang.Boolean.TRUE)
-                result.add(child)
-            }
-        }
-    }
-}
-
-private fun addStringFragment(string: String, result: MutableList<Any>) {
-    if (StringUtil.isEmpty(string)) return
-    val size = result.size
-    val last = if (size > 0) result[size - 1] else null
-    if (last is String) {
-        result[size - 1] = last.toString() + string
-    }
-    else {
-        result.add(string)
-    }
-}
