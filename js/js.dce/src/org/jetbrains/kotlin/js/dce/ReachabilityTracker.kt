@@ -98,8 +98,8 @@ class ReachabilityTracker(
     override fun visitFunction(x: JsFunction) {
         if (x !in analysisResult.functionsToEnter) {
             x.collectLocalVariables().let {
-                context.addLocalVars(it)
-                context.localVars += it
+                context.addNodesForLocalVars(it)
+                context.namesOfLocalVars += it
             }
             withErasedThis {
                 super.visitFunction(x)
@@ -138,8 +138,8 @@ class ReachabilityTracker(
         for (expr in node.functions) {
             reportAndNest("traverse: function", expr) {
                 expr.collectLocalVariables().let {
-                    context.addLocalVars(it)
-                    context.localVars += it
+                    context.addNodesForLocalVars(it)
+                    context.namesOfLocalVars += it
                 }
                 withErasedThis { expr.body.accept(this) }
             }

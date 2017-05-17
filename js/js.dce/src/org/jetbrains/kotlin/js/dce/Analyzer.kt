@@ -323,7 +323,7 @@ class Analyzer(private val context: Context) : JsVisitor() {
     // Traverse function's body
     private fun enterFunction(function: JsFunction, arguments: List<JsExpression>) {
         functionsToEnter += function
-        context.addLocalVars(function.collectLocalVariables())
+        context.addNodesForLocalVars(function.collectLocalVariables())
 
         for ((param, arg) in function.parameters.zip(arguments)) {
             if (arg is JsFunction && arg.name == null && isProperFunctionalParameter(arg.body, param)) {
@@ -341,7 +341,7 @@ class Analyzer(private val context: Context) : JsVisitor() {
 
     private fun enterFunctionWithGivenNodes(function: JsFunction, arguments: List<Node>) {
         functionsToEnter += function
-        context.addLocalVars(function.collectLocalVariables())
+        context.addNodesForLocalVars(function.collectLocalVariables())
 
         for ((param, arg) in function.parameters.zip(arguments)) {
             val paramNode = context.nodes[param.name]!!

@@ -40,7 +40,7 @@ class DeadCodeElimination(val logConsumer: (String) -> Unit) {
         val context = Context()
 
         val topLevelVars = collectDefinedNames(root)
-        context.addLocalVars(topLevelVars)
+        context.addNodesForLocalVars(topLevelVars)
         for (name in topLevelVars) {
             context.nodes[name]!!.alias(context.globalScope.member(name.ident))
         }
@@ -85,7 +85,10 @@ class DeadCodeElimination(val logConsumer: (String) -> Unit) {
             dce.apply(program.globalBlock)
 
             for ((file, block) in inputFiles.zip(blocks)) {
-               File(file.outputName).writeText(block.toString())
+                with(File(file.outputPath)) {
+                    parentFile.mkdirs()
+                    writeText(block.toString())
+                }
             }
 
             return DeadCodeEliminationResult(dce.reachableNodes)

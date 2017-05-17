@@ -26,9 +26,9 @@ class Context {
     var currentModule = globalScope
     val nodes = mutableMapOf<JsName, Node>()
     var thisNode: Node? = globalScope
-    val localVars = mutableSetOf<JsName>()
+    val namesOfLocalVars = mutableSetOf<JsName>()
 
-    fun addLocalVars(names: Collection<JsName>) {
+    fun addNodesForLocalVars(names: Collection<JsName>) {
         nodes += names.filter { it !in nodes }.associate { it to Node(it) }
     }
 
@@ -50,7 +50,7 @@ class Context {
                 if (qualifier == null) {
                     val name = expression.name
                     if (name != null) {
-                        if (name in localVars) return null
+                        if (name in namesOfLocalVars) return null
                         nodes[name]?.original?.let { return it }
                     }
                     globalScope.member(expression.ident)
