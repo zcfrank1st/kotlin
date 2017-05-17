@@ -22,7 +22,7 @@ class NameReplacingVisitor(private val replaceMap: Map<JsName, JsExpression>) : 
 
     override fun endVisit(x: JsNameRef, ctx: JsContext<JsNode>) {
         val replacement = replaceMap[x.name] ?: return
-        ctx.replaceMe(replacement.deepCopy().apply { source = x.source })
+        ctx.replaceMe(replacement.deepCopy().source(x.source))
     }
 
     override fun endVisit(x: JsVars.JsVar, ctx: JsContext<JsNode>) {
