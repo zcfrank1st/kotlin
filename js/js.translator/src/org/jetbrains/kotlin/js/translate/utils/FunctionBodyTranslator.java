@@ -16,12 +16,10 @@
 
 package org.jetbrains.kotlin.js.translate.utils;
 
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor;
-import org.jetbrains.kotlin.descriptors.SourceElement;
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor;
 import org.jetbrains.kotlin.js.backend.ast.*;
 import org.jetbrains.kotlin.js.backend.ast.metadata.MetadataProperties;
@@ -89,11 +87,7 @@ public final class FunctionBodyTranslator extends AbstractTranslator {
             JsStatement assignStatement = assignment(jsNameRef, defaultValue).makeStmt();
             JsStatement thenStatement = JsAstUtils.mergeStatementInBlockIfNeeded(assignStatement, defaultArgBlock);
             JsBinaryOperation checkArgIsUndefined = equality(jsNameRef, Namer.getUndefinedExpression());
-            SourceElement source = valueParameter.getSource();
-            PsiElement psi = KotlinSourceElementKt.getPsi(source);
-            if (psi != null) {
-                checkArgIsUndefined.source(psi);
-            }
+            checkArgIsUndefined.source(KotlinSourceElementKt.getPsi(valueParameter.getSource()));
             JsIf jsIf = JsAstUtils.newJsIf(checkArgIsUndefined, thenStatement);
             result.add(jsIf);
         }
