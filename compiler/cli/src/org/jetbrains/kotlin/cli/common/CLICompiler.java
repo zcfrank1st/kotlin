@@ -242,4 +242,10 @@ public abstract class CLICompiler<A extends CommonCompilerArguments> extends CLI
             @NotNull CompilerConfiguration configuration,
             @NotNull Disposable rootDisposable
     );
+
+    @NotNull
+    @Override
+    protected String getToolName() {
+        return "Kotlin Compiler";
+    }
 }

@@ -139,8 +139,10 @@ abstract class CLITool<A : CommonToolArguments> {
     protected fun <A : CommonToolArguments> printVersionIfNeeded(messageCollector: MessageCollector, arguments: A) {
         if (!arguments.version) return
 
-        messageCollector.report(CompilerMessageSeverity.INFO, "Kotlin Compiler version " + KotlinCompilerVersion.VERSION, null)
+        messageCollector.report(CompilerMessageSeverity.INFO, "$toolName version " + KotlinCompilerVersion.VERSION, null)
     }
+
+    protected abstract val toolName: String
 
     companion object {
         /**

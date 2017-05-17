@@ -69,7 +69,7 @@ class K2JSDce : CLITool<K2JSDceArguments>() {
     private fun checkSourceFiles(messageCollector: MessageCollector, files: List<InputFile>): Boolean {
         return files.fold(true) { ok, file ->
             val inputFile = File(file.path)
-            val outputFile = File(file.outputName)
+            val outputFile = File(file.outputPath)
 
             val inputOk = when {
                 !inputFile.exists() -> {
@@ -94,6 +94,8 @@ class K2JSDce : CLITool<K2JSDceArguments>() {
             ok and inputOk and outputOk
         }
     }
+
+    override val toolName: String = "Kotlin DCE"
 
     companion object {
         @JvmStatic
