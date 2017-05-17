@@ -49,7 +49,7 @@ class K2JSDce : CLITool<K2JSDceArguments>() {
             return ExitCode.COMPILATION_ERROR
         }
 
-        val includedDeclarations = arguments.includedDeclarations.orEmpty().toSet()
+        val includedDeclarations = arguments.declarationsToKeep.orEmpty().toSet()
 
         val dceResult = DeadCodeElimination.run(files, includedDeclarations) {
             messageCollector.report(CompilerMessageSeverity.LOGGING, it)

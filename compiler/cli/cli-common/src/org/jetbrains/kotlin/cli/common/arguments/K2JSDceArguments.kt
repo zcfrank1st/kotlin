@@ -27,11 +27,11 @@ class K2JSDceArguments : CommonToolArguments() {
     var outputDirectory: String? = null
 
     @field:Argument(
-            value = "-include",
+            value = "-keep",
             valueDescription = "<fully.qualified.name[,]>",
-            description = "List of fully-qualified names of declarations that should be included into resulting module")
+            description = "List of fully-qualified names of declarations that shouldn't be eliminated")
     @JvmField
-    var includedDeclarations: Array<String>? = null
+    var declarationsToKeep: Array<String>? = null
 
     @field:GradleOption(DefaultValues.BooleanFalseDefault::class)
     @field:Argument(value = "-Xprint-reachability-info", description = "Print declarations marked as reachable")
