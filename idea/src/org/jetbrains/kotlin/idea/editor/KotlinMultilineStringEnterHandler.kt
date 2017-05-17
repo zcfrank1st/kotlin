@@ -20,10 +20,13 @@ import com.intellij.codeInsight.CodeInsightSettings
 import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegate
 import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegate.Result
 import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegateAdapter
+import com.intellij.injected.editor.EditorWindow
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
+import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.TextRange
@@ -32,6 +35,7 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager
+import com.intellij.psi.impl.PsiManagerImpl
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
@@ -50,11 +54,25 @@ class KotlinMultilineStringEnterHandler : EnterHandlerDelegateAdapter() {
     override fun preprocessEnter(
             file: PsiFile, editor: Editor, caretOffset: Ref<Int>, caretAdvance: Ref<Int>, dataContext: DataContext,
             originalHandler: EditorActionHandler?): EnterHandlerDelegate.Result {
+        val offset = caretOffset.get().toInt()
+        if (editor !is EditorWindow) {
+            return preprocessEnter(file, editor, offset, originalHandler, dataContext)
+        }
+
+        val hostPosition = getHostPosition(dataContext) ?: return Result.Continue
+        return preprocessEnter(hostPosition, originalHandler, dataContext)
+    }
+
+    private fun preprocessEnter(hostPosition: HostPosition, originalHandler: EditorActionHandler?, dataContext: DataContext): Result {
+        val (file, editor, offset) = hostPosition
+        return preprocessEnter(file, editor, offset, originalHandler, dataContext)
+    }
+
+    private fun preprocessEnter(file: PsiFile, editor: Editor, offset: Int, originalHandler: EditorActionHandler?, dataContext: DataContext): Result {
         if (file !is KtFile) return Result.Continue
 
         val document = editor.document
         val text = document.text
-        val offset = caretOffset.get().toInt()
 
         if (offset == 0 || offset >= text.length) return Result.Continue
 
@@ -81,6 +99,15 @@ class KotlinMultilineStringEnterHandler : EnterHandlerDelegateAdapter() {
     }
 
     override fun postProcessEnter(file: PsiFile, editor: Editor, dataContext: DataContext): Result {
+        if (editor !is EditorWindow) {
+            return postProcessEnter(file, editor)
+        }
+
+        val hostPosition = getHostPosition(dataContext) ?: return Result.Continue
+        return postProcessEnter(hostPosition.file, hostPosition.editor)
+    }
+
+    private fun postProcessEnter(file: PsiFile, editor: Editor): Result {
         if (file !is KtFile) return Result.Continue
 
         if (!wasInMultilineString) return Result.Continue
@@ -343,6 +370,17 @@ class KotlinMultilineStringEnterHandler : EnterHandlerDelegateAdapter() {
                             ".$TRIM_MARGIN_CALL(\"$marginChar\")"
                         })
             }
+        }
+
+        private data class HostPosition(val file: PsiFile, val editor: Editor, val offset: Int)
+        private fun getHostPosition(dataContext: DataContext): HostPosition? {
+            val editor = CommonDataKeys.HOST_EDITOR.getData(dataContext) as? EditorEx ?: return null
+            val project = CommonDataKeys.PROJECT.getData(dataContext) ?: return null
+
+            val virtualFile = editor.virtualFile
+            val psiFile = PsiManagerImpl.getInstance(project).findFile(virtualFile) ?: return null
+
+            return HostPosition(psiFile, editor, editor.caretModel.offset)
         }
     }
 }
