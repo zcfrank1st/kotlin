@@ -21,7 +21,7 @@ import com.intellij.psi.*
 import com.intellij.psi.impl.PsiSubstitutorImpl
 import com.intellij.psi.impl.source.PsiClassReferenceType
 import com.intellij.psi.impl.source.PsiImmediateClassType
-import org.jetbrains.kotlin.annotation.processing.impl.toDisposable
+import org.jetbrains.kotlin.utils.toDisposable
 import org.jetbrains.kotlin.java.model.elements.JeTypeElement
 import org.jetbrains.kotlin.java.model.internal.getTypeWithTypeParameters
 import org.jetbrains.kotlin.java.model.internal.isStatic

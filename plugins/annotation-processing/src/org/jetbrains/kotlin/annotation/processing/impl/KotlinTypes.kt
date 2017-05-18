@@ -23,6 +23,8 @@ import com.intellij.psi.util.*
 import org.jetbrains.kotlin.java.model.JeElement
 import org.jetbrains.kotlin.java.model.elements.*
 import org.jetbrains.kotlin.java.model.types.*
+import org.jetbrains.kotlin.utils.toDisposable
+import org.jetbrains.kotlin.utils.dispose
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.*

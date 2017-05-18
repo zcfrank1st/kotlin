@@ -20,7 +20,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
-import org.jetbrains.kotlin.annotation.processing.impl.toDisposable
+import org.jetbrains.kotlin.utils.toDisposable
 import org.jetbrains.kotlin.java.model.internal.JeElementRegistry
 import javax.lang.model.element.Element
 

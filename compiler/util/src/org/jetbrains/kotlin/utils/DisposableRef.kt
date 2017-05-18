@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jetbrains.kotlin.annotation.processing.impl
+package org.jetbrains.kotlin.utils
 
 import com.intellij.openapi.Disposable
 

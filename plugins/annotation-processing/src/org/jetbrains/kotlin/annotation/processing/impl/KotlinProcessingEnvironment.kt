@@ -24,6 +24,8 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.kotlin.java.model.internal.JeElementRegistry
 import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.utils.toDisposable
+import org.jetbrains.kotlin.utils.dispose
 import java.io.File
 import java.util.*
 import javax.annotation.processing.ProcessingEnvironment

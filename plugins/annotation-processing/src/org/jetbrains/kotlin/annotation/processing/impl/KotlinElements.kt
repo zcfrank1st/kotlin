@@ -28,6 +28,8 @@ import org.jetbrains.kotlin.java.model.elements.JeMethodExecutableElement
 import org.jetbrains.kotlin.java.model.elements.JePackageElement
 import org.jetbrains.kotlin.java.model.elements.JeTypeElement
 import org.jetbrains.kotlin.java.model.internal.getTypeWithTypeParameters
+import org.jetbrains.kotlin.utils.toDisposable
+import org.jetbrains.kotlin.utils.dispose
 import java.io.PrintWriter
 import java.io.Writer
 import javax.lang.model.element.*

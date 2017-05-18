@@ -19,6 +19,8 @@ package org.jetbrains.kotlin.annotation.processing.impl
 import com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.annotation.processing.RoundAnnotations
 import org.jetbrains.kotlin.java.model.toJeElement
+import org.jetbrains.kotlin.utils.toDisposable
+import org.jetbrains.kotlin.utils.dispose
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement

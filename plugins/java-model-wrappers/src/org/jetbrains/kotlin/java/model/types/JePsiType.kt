@@ -20,9 +20,9 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiType
-import org.jetbrains.kotlin.annotation.processing.impl.toDisposable
+import org.jetbrains.kotlin.utils.toDisposable
 import org.jetbrains.kotlin.java.model.internal.JeElementRegistry
-import org.jetbrains.kotlin.annotation.processing.impl.dispose
+import org.jetbrains.kotlin.utils.dispose
 
 interface JePsiType : JeTypeMirror {
     val psiType: PsiType

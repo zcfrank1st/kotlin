@@ -21,8 +21,8 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiType
 import com.intellij.psi.util.MethodSignature
 import com.intellij.psi.util.PsiTypesUtil
-import org.jetbrains.kotlin.annotation.processing.impl.toDisposable
-import org.jetbrains.kotlin.annotation.processing.impl.dispose
+import org.jetbrains.kotlin.utils.toDisposable
+import org.jetbrains.kotlin.utils.dispose
 import org.jetbrains.kotlin.java.model.JeDisposablePsiElementOwner
 import org.jetbrains.kotlin.java.model.elements.getReceiverTypeMirror
 import javax.lang.model.type.ExecutableType

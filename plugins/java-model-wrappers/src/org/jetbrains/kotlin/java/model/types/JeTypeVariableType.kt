@@ -18,7 +18,7 @@ package org.jetbrains.kotlin.java.model.types
 
 import org.jetbrains.kotlin.java.model.elements.JeTypeParameterElement
 import com.intellij.psi.*
-import org.jetbrains.kotlin.annotation.processing.impl.toDisposable
+import org.jetbrains.kotlin.utils.toDisposable
 import org.jetbrains.kotlin.java.model.toJeElement
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
