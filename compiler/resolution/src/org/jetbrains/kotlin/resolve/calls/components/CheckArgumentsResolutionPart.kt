@@ -16,10 +16,7 @@
 
 package org.jetbrains.kotlin.resolve.calls.components
 
-import org.jetbrains.kotlin.builtins.ReflectionTypes
-import org.jetbrains.kotlin.builtins.getValueParameterTypesFromFunctionType
-import org.jetbrains.kotlin.builtins.isExtensionFunctionType
-import org.jetbrains.kotlin.builtins.isFunctionType
+import org.jetbrains.kotlin.builtins.*
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.resolve.calls.components.CreateDescriptorWithFreshTypeVariables.createToFreshVariableSubstitutorAndAddInitialConstraints
@@ -91,7 +88,7 @@ internal object CheckArguments : ResolutionPart {
     ): List<UnwrappedType> {
         argument.parametersTypes?.map { it ?: createFreshType() } ?.let { return it }
 
-        if (expectedType.isFunctionType) {
+        if (expectedType.isBuiltinFunctionalType) {
             return expectedType.getValueParameterTypesFromFunctionType().map { createFreshType() }
         }
 
@@ -106,7 +103,7 @@ internal object CheckArguments : ResolutionPart {
     ) : UnwrappedType? {
         if (argument is FunctionExpression) return argument.receiverType
 
-        if (expectedType.isExtensionFunctionType) return createFreshType()
+        if (expectedType.isBuiltinExtensionFunctionalType) return createFreshType()
 
         return null
     }
@@ -127,7 +124,7 @@ internal object CheckArguments : ResolutionPart {
             expectedType: UnwrappedType
     ): KotlinCallDiagnostic? {
         // initial checks
-        if (expectedType.isFunctionType) {
+        if (expectedType.isBuiltinFunctionalType) {
             val expectedParameterCount = expectedType.getValueParameterTypesFromFunctionType().size
 
             argument.parametersTypes?.size?.let {
@@ -135,8 +132,8 @@ internal object CheckArguments : ResolutionPart {
             }
 
             if (argument is FunctionExpression) {
-                if (argument.receiverType != null && !expectedType.isExtensionFunctionType) return UnexpectedReceiver(argument)
-                if (argument.receiverType == null && expectedType.isExtensionFunctionType) return MissingReceiver(argument)
+                if (argument.receiverType != null && !expectedType.isBuiltinExtensionFunctionalType) return UnexpectedReceiver(argument)
+                if (argument.receiverType == null && expectedType.isBuiltinExtensionFunctionalType) return MissingReceiver(argument)
             }
         }
 
@@ -154,7 +151,8 @@ internal object CheckArguments : ResolutionPart {
             LambdaTypeVariable(argument, LambdaTypeVariable.Kind.RETURN_TYPE, builtIns).apply { freshVariables.add(this) }.defaultType
         }
 
-        val resolvedArgument = ResolvedLambdaArgument(kotlinCall, argument, freshVariables, receiver, parameters, returnType)
+        val isSuspend = expectedType.isSuspendFunctionType
+        val resolvedArgument = ResolvedLambdaArgument(kotlinCall, argument, freshVariables, isSuspend, receiver, parameters, returnType)
 
         freshVariables.forEach(csBuilder::registerVariable)
         csBuilder.addSubtypeConstraint(resolvedArgument.type, expectedType, ArgumentConstraintPosition(argument))
