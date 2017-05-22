@@ -505,7 +505,7 @@ class DoubleColonExpressionResolver(
         val callableReference = expression.callableReference
         if (callableReference.getReferencedName().isEmpty()) {
             if (!expression.isEmptyLHS) resolveDoubleColonLHS(expression, c)
-            c.trace.report(UNRESOLVED_REFERENCE.on(callableReference, callableReference))
+            c.trace.report(UNRESOLVED_REFERENCE.on(callableReference))
             val errorType = ErrorUtils.createErrorType("Empty callable reference")
             return dataFlowAnalyzer.createCheckedTypeInfo(errorType, c, expression)
         }
@@ -528,7 +528,7 @@ class DoubleColonExpressionResolver(
                     resolvedCall?.resultingDescriptor ?: return null
                 }
                 else {
-                    context.trace.report(UNRESOLVED_REFERENCE.on(expression.callableReference, expression.callableReference))
+                    context.trace.report(UNRESOLVED_REFERENCE.on(expression.callableReference))
                     return null
                 }
 

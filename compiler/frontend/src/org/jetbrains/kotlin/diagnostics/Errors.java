@@ -49,9 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.jetbrains.kotlin.diagnostics.PositioningStrategies.*;
-import static org.jetbrains.kotlin.diagnostics.Severity.ERROR;
-import static org.jetbrains.kotlin.diagnostics.Severity.INFO;
-import static org.jetbrains.kotlin.diagnostics.Severity.WARNING;
+import static org.jetbrains.kotlin.diagnostics.Severity.*;
 
 /**
  * For error messages, see DefaultErrorMessages and IdeErrorMessages.
@@ -89,8 +87,7 @@ public interface Errors {
     DiagnosticFactory2<KtDeclaration, PropertyDescriptor, FunctionDescriptor> EXTENSION_FUNCTION_SHADOWED_BY_MEMBER_PROPERTY_WITH_INVOKE =
             DiagnosticFactory2.create(WARNING, FOR_REDECLARATION);
 
-    DiagnosticFactory1<KtReferenceExpression, KtReferenceExpression> UNRESOLVED_REFERENCE =
-            DiagnosticFactory1.create(ERROR, FOR_UNRESOLVED_REFERENCE);
+    DiagnosticFactory0<KtReferenceExpression> UNRESOLVED_REFERENCE = DiagnosticFactory0.create(ERROR, FOR_UNRESOLVED_REFERENCE);
 
     DiagnosticFactory2<PsiElement, DeclarationDescriptor, String> DEPRECATION = DiagnosticFactory2.create(WARNING);
     DiagnosticFactory2<PsiElement, DeclarationDescriptor, String> DEPRECATION_ERROR = DiagnosticFactory2.create(ERROR);
