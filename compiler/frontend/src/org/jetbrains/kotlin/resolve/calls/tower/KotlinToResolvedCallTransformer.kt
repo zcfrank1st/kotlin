@@ -68,6 +68,11 @@ class KotlinToResolvedCallTransformer(
 
             if (trace != null) {
                 runLambdaArgumentsChecks(context, trace, baseResolvedCall.lambdaArguments)
+                allResolvedCalls.map {
+                    if (it is VariableAsFunctionResolvedCall) it.functionCall else it
+                }.forEach {
+                    runArgumentsChecks(context, trace, it as NewResolvedCallImpl<*>)
+                }
             }
 
             val callCheckerContext = CallCheckerContext(context, languageFeatureSettings)
@@ -117,13 +122,13 @@ class KotlinToResolvedCallTransformer(
 
         val resolvedCall = when (completedCall) {
             is CompletedKotlinCall.Simple -> {
-                NewResolvedCallImpl<D>(completedCall).runIfTraceNotNull(this::bindResolvedCall).runIfTraceNotNull(this::runArgumentsChecks)
+                NewResolvedCallImpl<D>(completedCall).runIfTraceNotNull(this::bindResolvedCall)
             }
             is CompletedKotlinCall.VariableAsFunction -> {
                 val resolvedCall = NewVariableAsFunctionResolvedCallImpl(
                         completedCall,
                         NewResolvedCallImpl(completedCall.variableCall),
-                        NewResolvedCallImpl<FunctionDescriptor>(completedCall.invokeCall).runIfTraceNotNull(this::runArgumentsChecks)
+                        NewResolvedCallImpl<FunctionDescriptor>(completedCall.invokeCall)
                 ).runIfTraceNotNull(this::bindResolvedCall)
 
                 @Suppress("UNCHECKED_CAST")
