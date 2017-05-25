@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,7 +193,7 @@ fun createResolutionCandidatesForConstructors(
         call: Call,
         typeWithConstructors: KotlinType,
         useKnownTypeSubstitutor: Boolean
-): Collection<ResolutionCandidate<ConstructorDescriptor>> {
+): List<ResolutionCandidate<FunctionDescriptor>> {
     val classWithConstructors = typeWithConstructors.constructor.declarationDescriptor as ClassDescriptor
 
     val unwrappedType = typeWithConstructors.unwrap()
@@ -233,7 +233,9 @@ fun createResolutionCandidatesForConstructors(
         dispatchReceiver = null
     }
 
-    return constructors.map {
+    val syntheticConstructors = constructors.mapNotNull { it.createSamAdapterConstructor() }
+
+    return (constructors + syntheticConstructors).map {
         ResolutionCandidate.create(call, it, dispatchReceiver, receiverKind, knownSubstitutor)
     }
 }

@@ -314,7 +314,7 @@ public class CallResolver {
         return resolveCallForInvoke(context.replaceCall(call), tracingForInvoke);
     }
 
-    private OverloadResolutionResults<ConstructorDescriptor> resolveCallForConstructor(
+    private OverloadResolutionResults<FunctionDescriptor> resolveCallForConstructor(
             @NotNull BasicCallResolutionContext context,
             @NotNull KtConstructorCalleeExpression expression
     ) {
@@ -351,22 +351,22 @@ public class CallResolver {
     }
 
     @NotNull
-    public OverloadResolutionResults<ConstructorDescriptor> resolveConstructorCall(
+    public OverloadResolutionResults<FunctionDescriptor> resolveConstructorCall(
             @NotNull BasicCallResolutionContext context,
             @NotNull KtReferenceExpression functionReference,
             @NotNull KotlinType constructedType
     ) {
-        Pair<Collection<ResolutionCandidate<ConstructorDescriptor>>, BasicCallResolutionContext> candidatesAndContext =
+        Pair<Collection<ResolutionCandidate<FunctionDescriptor>>, BasicCallResolutionContext> candidatesAndContext =
                 prepareCandidatesAndContextForConstructorCall(constructedType, context);
 
-        Collection<ResolutionCandidate<ConstructorDescriptor>> candidates = candidatesAndContext.getFirst();
+        Collection<ResolutionCandidate<FunctionDescriptor>> candidates = candidatesAndContext.getFirst();
         context = candidatesAndContext.getSecond();
 
         return computeTasksFromCandidatesAndResolvedCall(context, functionReference, candidates);
     }
 
     @Nullable
-    public OverloadResolutionResults<ConstructorDescriptor> resolveConstructorDelegationCall(
+    public OverloadResolutionResults<FunctionDescriptor> resolveConstructorDelegationCall(
             @NotNull BindingTrace trace, @NotNull LexicalScope scope, @NotNull DataFlowInfo dataFlowInfo,
             @NotNull ClassConstructorDescriptor constructorDescriptor,
             @NotNull KtConstructorDelegationCall call
@@ -396,7 +396,7 @@ public class CallResolver {
     }
 
     @NotNull
-    private OverloadResolutionResults<ConstructorDescriptor> resolveConstructorDelegationCall(
+    private OverloadResolutionResults<FunctionDescriptor> resolveConstructorDelegationCall(
             @NotNull BasicCallResolutionContext context,
             @NotNull KtConstructorDelegationCall call,
             @NotNull KtConstructorDelegationReferenceExpression calleeExpression,
@@ -436,9 +436,9 @@ public class CallResolver {
                                   calleeConstructor.getContainingDeclaration().getDefaultType() :
                                   DescriptorUtils.getSuperClassType(currentClassDescriptor);
 
-        Pair<Collection<ResolutionCandidate<ConstructorDescriptor>>, BasicCallResolutionContext> candidatesAndContext =
+        Pair<Collection<ResolutionCandidate<FunctionDescriptor>>, BasicCallResolutionContext> candidatesAndContext =
                 prepareCandidatesAndContextForConstructorCall(superType, context);
-        Collection<ResolutionCandidate<ConstructorDescriptor>> candidates = candidatesAndContext.getFirst();
+        Collection<ResolutionCandidate<FunctionDescriptor>> candidates = candidatesAndContext.getFirst();
         context = candidatesAndContext.getSecond();
 
         TracingStrategy tracing = call.isImplicit() ?
@@ -457,12 +457,12 @@ public class CallResolver {
     }
 
     @NotNull
-    private static Pair<Collection<ResolutionCandidate<ConstructorDescriptor>>, BasicCallResolutionContext> prepareCandidatesAndContextForConstructorCall(
+    private static Pair<Collection<ResolutionCandidate<FunctionDescriptor>>, BasicCallResolutionContext> prepareCandidatesAndContextForConstructorCall(
             @NotNull KotlinType superType,
             @NotNull BasicCallResolutionContext context
     ) {
         if (!(superType.getConstructor().getDeclarationDescriptor() instanceof ClassDescriptor)) {
-            return new Pair<>(Collections.<ResolutionCandidate<ConstructorDescriptor>>emptyList(), context);
+            return new Pair<>(Collections.<ResolutionCandidate<FunctionDescriptor>>emptyList(), context);
         }
 
         // If any constructor has type parameter (currently it only can be true for ones from Java), try to infer arguments for them
@@ -474,7 +474,7 @@ public class CallResolver {
             context = context.replaceExpectedType(superType);
         }
 
-        Collection<ResolutionCandidate<ConstructorDescriptor>> candidates =
+        List<ResolutionCandidate<FunctionDescriptor>> candidates =
                 CallResolverUtilKt.createResolutionCandidatesForConstructors(
                         context.scope, context.call, superType, !anyConstructorHasDeclaredTypeParameters
                 );

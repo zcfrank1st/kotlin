@@ -23,10 +23,7 @@ import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
 import org.jetbrains.kotlin.descriptors.synthetic.SyntheticMemberDescriptor
 import org.jetbrains.kotlin.incremental.components.LookupLocation
-import org.jetbrains.kotlin.load.java.descriptors.JavaClassDescriptor
-import org.jetbrains.kotlin.load.java.descriptors.JavaMethodDescriptor
-import org.jetbrains.kotlin.load.java.descriptors.SamAdapterDescriptor
-import org.jetbrains.kotlin.load.java.descriptors.SamConstructorDescriptor
+import org.jetbrains.kotlin.load.java.descriptors.*
 import org.jetbrains.kotlin.load.java.lazy.descriptors.LazyJavaClassDescriptor
 import org.jetbrains.kotlin.load.java.sam.SingleAbstractMethodUtils
 import org.jetbrains.kotlin.name.Name
@@ -61,7 +58,7 @@ class SamAdapterFunctionsScope(
 
     private val samConstructorForClassifier =
             storageManager.createMemoizedFunction<JavaClassDescriptor, SamConstructorDescriptor> { classifier ->
-                samConstructorForClassifierNotCached(classifier)
+                SingleAbstractMethodUtils.createSamConstructorFunction(classifier.containingDeclaration, classifier)
             }
 
     private fun extensionForFunctionNotCached(function: FunctionDescriptor): FunctionDescriptor? {
@@ -71,10 +68,6 @@ class SamAdapterFunctionsScope(
         if (function.returnType == null) return null
         if (function.isHiddenInResolution(languageVersionSettings)) return null
         return MyFunctionDescriptor.create(function)
-    }
-
-    private fun samConstructorForClassifierNotCached(classifier: JavaClassDescriptor): SamConstructorDescriptor {
-        return SingleAbstractMethodUtils.createSamConstructorFunction(classifier.containingDeclaration, classifier)
     }
 
     override fun getSyntheticMemberFunctions(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<FunctionDescriptor> {
@@ -129,6 +122,20 @@ class SamAdapterFunctionsScope(
         return getSamFunctions(scope.getContributedFunctions(name, location)) + listOfNotNull(samConstructor)
     }
 
+    override fun getSyntheticConstructors(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor> {
+        val classifier = scope.getContributedClassifier(name, location) ?: return emptyList()
+        if (classifier !is JavaClassDescriptor) return emptyList()
+
+        return arrayListOf<FunctionDescriptor>().apply {
+            for (constructor in classifier.constructors) {
+                if (constructor !is JavaClassConstructorDescriptor) continue
+                val samConstructor = constructor.createSamAdapterConstructor() ?: continue
+
+                add(samConstructor)
+            }
+        }
+    }
+
     override fun getSyntheticStaticFunctions(scope: ResolutionScope): Collection<FunctionDescriptor> {
         val samConstructors =
                 scope.getContributedDescriptors(DescriptorKindFilter.CLASSIFIERS)
@@ -136,6 +143,10 @@ class SamAdapterFunctionsScope(
                         .mapNotNull{ getSamConstructor(it) }
 
         return getSamFunctions(scope.getContributedDescriptors(DescriptorKindFilter.FUNCTIONS)) + samConstructors
+    }
+
+    override fun getSyntheticConstructors(scope: ResolutionScope): Collection<FunctionDescriptor> {
+        return emptyList()
     }
 
     private fun getSamFunctions(functions: Collection<DeclarationDescriptor>): List<SamAdapterDescriptor<JavaMethodDescriptor>> {
