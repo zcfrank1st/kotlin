@@ -126,7 +126,7 @@ inline fun <T, C : Collection<T>, O> C.ifNotEmpty(body: C.() -> O?): O? = if (is
 
 inline fun <T, O> Array<out T>.ifNotEmpty(body: Array<out T>.() -> O?): O? = if (isNotEmpty()) this.body() else null
 
-public fun <T> Iterable<Iterable<T>>.flattenTo(c: MutableList<T>): List<T> {
+fun <T, C : MutableCollection<in T>> Iterable<Iterable<T>>.flattenTo(c: C): C {
     for (element in this) {
         c.addAll(element)
     }
