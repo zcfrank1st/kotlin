@@ -46,12 +46,15 @@ fun generateDelegateCall(
         context: TranslationContext,
         detectDefaultParameters: Boolean
 ): JsStatement {
-    val overriddenMemberFunctionName = if (detectDefaultParameters && toDescriptor.hasOrInheritsParametersWithDefaultValue()) {
-        context.scope().declareName(context.getNameForDescriptor(toDescriptor).ident + Namer.DEFAULT_PARAMETER_IMPLEMENTOR_SUFFIX)
-    }
-    else {
-        context.getNameForDescriptor(toDescriptor)
-    }
+    fun FunctionDescriptor.getNameForFunctionWithPossibleDefaultParam() =
+            if (detectDefaultParameters && hasOrInheritsParametersWithDefaultValue()) {
+                context.scope().declareName(context.getNameForDescriptor(this).ident + Namer.DEFAULT_PARAMETER_IMPLEMENTOR_SUFFIX)
+            }
+            else {
+                context.getNameForDescriptor(this)
+            }
+
+    val overriddenMemberFunctionName = toDescriptor.getNameForFunctionWithPossibleDefaultParam()
     val overriddenMemberFunctionRef = JsNameRef(overriddenMemberFunctionName, thisObject)
 
     val parameters = SmartList<JsParameter>()
@@ -81,12 +84,7 @@ fun generateDelegateCall(
     val functionObject = simpleReturnFunction(context.scope(), invocation)
     functionObject.parameters.addAll(parameters)
 
-    val fromFunctionName = if (detectDefaultParameters && fromDescriptor.hasOrInheritsParametersWithDefaultValue()) {
-        context.scope().declareName(context.getNameForDescriptor(fromDescriptor).ident + Namer.DEFAULT_PARAMETER_IMPLEMENTOR_SUFFIX)
-    }
-    else {
-        context.getNameForDescriptor(fromDescriptor)
-    }
+    val fromFunctionName = fromDescriptor.getNameForFunctionWithPossibleDefaultParam()
 
     val prototypeRef = JsAstUtils.prototypeOf(context.getInnerReference(classDescriptor))
     val functionRef = JsNameRef(fromFunctionName, prototypeRef)
