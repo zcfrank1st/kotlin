@@ -35,6 +35,7 @@ import org.jetbrains.kotlin.js.translate.reference.ReferenceTranslator
 import org.jetbrains.kotlin.js.translate.utils.TranslationUtils.simpleReturnFunction
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.DescriptorUtils
+import org.jetbrains.kotlin.resolve.descriptorUtil.hasOrInheritsParametersWithDefaultValue
 import org.jetbrains.kotlin.types.KotlinType
 
 fun generateDelegateCall(
@@ -42,9 +43,15 @@ fun generateDelegateCall(
         fromDescriptor: FunctionDescriptor,
         toDescriptor: FunctionDescriptor,
         thisObject: JsExpression,
-        context: TranslationContext
+        context: TranslationContext,
+        detectDefaultParameters: Boolean
 ): JsStatement {
-    val overriddenMemberFunctionName = context.getNameForDescriptor(toDescriptor)
+    val overriddenMemberFunctionName = if (detectDefaultParameters && toDescriptor.hasOrInheritsParametersWithDefaultValue()) {
+        context.scope().declareName(context.getNameForDescriptor(toDescriptor).ident + Namer.DEFAULT_PARAMETER_IMPLEMENTOR_SUFFIX)
+    }
+    else {
+        context.getNameForDescriptor(toDescriptor)
+    }
     val overriddenMemberFunctionRef = JsNameRef(overriddenMemberFunctionName, thisObject)
 
     val parameters = SmartList<JsParameter>()
@@ -71,10 +78,19 @@ fun generateDelegateCall(
         JsInvocation(overriddenMemberFunctionRef, args)
     }
 
-    val functionObject = simpleReturnFunction(context.getScopeForDescriptor(fromDescriptor), invocation)
+    val functionObject = simpleReturnFunction(context.scope(), invocation)
     functionObject.parameters.addAll(parameters)
 
-    return context.addFunctionToPrototype(classDescriptor, fromDescriptor, functionObject)
+    val fromFunctionName = if (detectDefaultParameters && fromDescriptor.hasOrInheritsParametersWithDefaultValue()) {
+        context.scope().declareName(context.getNameForDescriptor(fromDescriptor).ident + Namer.DEFAULT_PARAMETER_IMPLEMENTOR_SUFFIX)
+    }
+    else {
+        context.getNameForDescriptor(fromDescriptor)
+    }
+
+    val prototypeRef = JsAstUtils.prototypeOf(context.getInnerReference(classDescriptor))
+    val functionRef = JsNameRef(fromFunctionName, prototypeRef)
+    return JsAstUtils.assignment(functionRef, functionObject).makeStmt()
 }
 
 fun <T, S> List<T>.splitToRanges(classifier: (T) -> S): List<Pair<List<T>, S>> {
