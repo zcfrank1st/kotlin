@@ -88,7 +88,9 @@ class RemoveExplicitTypeArgumentsIntention : SelfTargetingOffsetIndependentInten
                 }
             }
 
-            return args.size == newArgs.size && args.values.zip(newArgs.values).all { pair -> equalTypes(pair.first, pair.second) }
+            return args.size == newArgs.size && args.values.zip(newArgs.values).all { (argType, newArgType) ->
+                equalTypes(argType, newArgType)
+            }
         }
     }
 
