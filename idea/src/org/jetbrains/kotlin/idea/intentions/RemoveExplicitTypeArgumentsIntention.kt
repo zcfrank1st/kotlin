@@ -16,7 +16,6 @@
 
 package org.jetbrains.kotlin.idea.intentions
 
-import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.openapi.editor.Editor
 import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
 import org.jetbrains.kotlin.idea.inspections.IntentionBasedInspection
@@ -34,12 +33,12 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 
-class RemoveExplicitTypeArgumentsInspection : IntentionBasedInspection<KtTypeArgumentList>(RemoveExplicitTypeArgumentsIntention::class) {
-    override fun problemHighlightType(element: KtTypeArgumentList): ProblemHighlightType =
-            ProblemHighlightType.LIKE_UNUSED_SYMBOL
-}
+class RemoveExplicitTypeArgumentsInspection : IntentionBasedInspection<KtTypeArgumentList>(RemoveExplicitTypeArgumentsIntention::class)
 
-class RemoveExplicitTypeArgumentsIntention : SelfTargetingOffsetIndependentIntention<KtTypeArgumentList>(KtTypeArgumentList::class.java, "Remove explicit type arguments") {
+class RemoveExplicitTypeArgumentsIntention : SelfTargetingOffsetIndependentIntention<KtTypeArgumentList>(
+        KtTypeArgumentList::class.java,
+        "Remove explicit type arguments"
+) {
     companion object {
         fun isApplicableTo(element: KtTypeArgumentList, approximateFlexible: Boolean): Boolean {
             val callExpression = element.parent as? KtCallExpression ?: return false
