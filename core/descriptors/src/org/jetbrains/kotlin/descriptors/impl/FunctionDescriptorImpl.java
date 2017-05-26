@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.descriptors.impl;
 
+import kotlin.collections.CollectionsKt;
 import kotlin.jvm.functions.Function0;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -690,7 +691,7 @@ public abstract class FunctionDescriptorImpl extends DeclarationDescriptorNonRoo
 
         if (configuration.copyOverrides && !getOriginal().getOverriddenDescriptors().isEmpty()) {
             if (configuration.substitution.isEmpty()) {
-                Function0<Set<FunctionDescriptor>> overriddenFunctionsTask = lazyOverriddenFunctionsTask;
+                Function0<Collection<FunctionDescriptor>> overriddenFunctionsTask = lazyOverriddenFunctionsTask;
                 if (overriddenFunctionsTask != null) {
                     substitutedDescriptor.lazyOverriddenFunctionsTask = overriddenFunctionsTask;
                 }
