@@ -22,9 +22,14 @@ import com.intellij.codeInsight.FileModificationService
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.android.util.AndroidBundle
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.idea.caches.resolve.analyze
+import org.jetbrains.kotlin.idea.search.usagesSearch.descriptor
 import org.jetbrains.kotlin.idea.util.addAnnotation
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 
 
 class AddTargetApiQuickFix(
@@ -60,27 +65,38 @@ class AddTargetApiQuickFix(
              annotationContainer.addAnnotation(
                     if (useRequiresApi) FQNAME_REQUIRES_API else FQNAME_TARGET_API,
                     getAnnotationValue(true),
-                    whiteSpaceText = "\n")
+                    whiteSpaceText = if (annotationContainer.isNewLineNeededForAnnotation()) "\n" else " ")
         }
     }
 
+    private fun KtElement.isNewLineNeededForAnnotation() = !(this is KtParameter || this is KtTypeParameter || this is KtPropertyAccessor)
+
     private fun getAnnotationValue(fullyQualified: Boolean) = getVersionField(api, fullyQualified)
 
-    private fun getAnnotationContainer(element: PsiElement, useRequiresApi: Boolean) =
-            PsiTreeUtil.findFirstParent(element) {
-                if (useRequiresApi)
-                    it.isRequiresApiAnnotationValidTarget()
-                else
-                    it.isTargetApiAnnotationValidTarget()
-            }
+    private fun getAnnotationContainer(element: PsiElement, useRequiresApi: Boolean): PsiElement? {
+        return PsiTreeUtil.findFirstParent(element) {
+            if (useRequiresApi)
+                it.isRequiresApiAnnotationValidTarget()
+            else
+                it.isTargetApiAnnotationValidTarget()
+        }
+    }
 
+    private fun PsiElement.isRequiresApiAnnotationValidTarget(): Boolean {
+        return this is KtClassOrObject ||
+               (this is KtFunction && this !is KtFunctionLiteral) ||
+               (this is KtProperty && !isLocal && hasBackingField()) ||
+               this is KtPropertyAccessor
+    }
 
-    // TODO: KtFunctionLiteral is not supported now because addAnnotation fails to shorten references, investigate
-    private fun PsiElement.isRequiresApiAnnotationValidTarget() = this is KtClassOrObject ||
-                                                                  (this is KtFunction && this !is KtFunctionLiteral) ||
-                                                                  (this is KtProperty && !this.isLocal)
+    private fun PsiElement.isTargetApiAnnotationValidTarget(): Boolean {
+        return this is KtClassOrObject ||
+               (this is KtFunction && this !is KtFunctionLiteral) ||
+               this is KtPropertyAccessor
+    }
 
-    // TODO: KtFunctionLiteral is not supported now because addAnnotation fails to shorten references, investigate
-    private fun PsiElement.isTargetApiAnnotationValidTarget() = this is KtClassOrObject ||
-                                                                (this is KtFunction && this !is KtFunctionLiteral)
+    private fun KtProperty.hasBackingField(): Boolean {
+        val propertyDescriptor = descriptor as? PropertyDescriptor ?: return false
+        return analyze(BodyResolveMode.PARTIAL)[BindingContext.BACKING_FIELD_REQUIRED, propertyDescriptor] ?: false
+    }
 }
