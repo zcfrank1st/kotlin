@@ -97,8 +97,6 @@ private class SimpleTypeImpl(
     override fun makeNullableAsSpecified(newNullability: Boolean) =
             if (newNullability == isMarkedNullable)
                 this
-            else if (newNullability)
-                NullableSimpleType(this)
             else
                 SimpleTypeImpl(annotations, constructor, arguments, newNullability, memberScope)
 
