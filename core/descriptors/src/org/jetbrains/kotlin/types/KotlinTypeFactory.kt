@@ -89,16 +89,10 @@ private class SimpleTypeImpl(
         override val memberScope: MemberScope
 ) : SimpleType() {
     override fun replaceAnnotations(newAnnotations: Annotations) =
-            if (newAnnotations === annotations)
-                this
-            else
-                SimpleTypeImpl(newAnnotations, constructor, arguments, isMarkedNullable, memberScope)
+            SimpleTypeImpl(newAnnotations, constructor, arguments, isMarkedNullable, memberScope)
 
     override fun makeNullableAsSpecified(newNullability: Boolean) =
-            if (newNullability == isMarkedNullable)
-                this
-            else
-                SimpleTypeImpl(annotations, constructor, arguments, newNullability, memberScope)
+            SimpleTypeImpl(annotations, constructor, arguments, newNullability, memberScope)
 
     init {
         if (memberScope is ErrorUtils.ErrorScope) {

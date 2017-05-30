@@ -59,8 +59,6 @@ class MemoryOptimizationsTest : KtUsefulTestCase() {
         assertTrue(parameterType.lowerIfFlexible() === upperBound.makeNullableAsSpecified(false))
     }
 
-
-
     @Test
     fun testSubstitutorDoNotRecreateUnchangedDescriptor() {
         val text =
