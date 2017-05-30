@@ -36,6 +36,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.hasOwnParametersWithDefaultVa
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.source.getPsi
+import org.jetbrains.kotlin.utils.DFS
 import org.jetbrains.kotlin.utils.identity
 
 class ClassModelGenerator(val context: StaticContext) {
@@ -156,7 +157,7 @@ class ClassModelGenerator(val context: StaticContext) {
         // If one of overridden members is non-abstract, copy it.
         // When none found, we have nothing to copy, ignore.
         // When multiple found, our current class should provide implementation, ignore.
-        val memberToCopy = member.overriddenDescriptors
+        val memberToCopy = member.findNonRepeatingOverriddenDescriptors { overriddenDescriptors }
                 .filter { it.modality != Modality.ABSTRACT }
                 .singleOrNull() ?: return null
 
@@ -171,7 +172,7 @@ class ClassModelGenerator(val context: StaticContext) {
         // If one of overridden members has parameters with default value, copy it.
         // When non found, we have nothing to copy, ignore.
         // When multiple found, our current class should provide implementation, ignore.
-        val memberToCopy = member.overriddenDescriptors
+        val memberToCopy = member.findNonRepeatingOverriddenDescriptors { overriddenDescriptors }
                 .filter { it.hasOrInheritsParametersWithDefaultValue() }
                 .singleOrNull() ?: return null
 
@@ -180,6 +181,19 @@ class ClassModelGenerator(val context: StaticContext) {
 
         // If found member is fake itself, repeat search for it, until we find actual implementation
         return if (!memberToCopy.kind.isReal) findOptionalArgsMemberToCopy(memberToCopy) else memberToCopy
+    }
+
+    private fun <T : CallableMemberDescriptor> T.findNonRepeatingOverriddenDescriptors(
+            getTypedOverriddenDescriptors: T.() -> Collection<T>
+    ): List<T> {
+        val directOverriddenDescriptors = getTypedOverriddenDescriptors()
+        val allDescriptors = DFS.topologicalOrder(directOverriddenDescriptors) {
+            descriptor: T -> descriptor.getTypedOverriddenDescriptors()
+        }
+        val repeatedDescriptors = allDescriptors.asSequence()
+                .flatMap { it.getTypedOverriddenDescriptors().asSequence() }
+                .toSet()
+        return directOverriddenDescriptors.filter { it !in repeatedDescriptors }
     }
 
     private fun generateBridgeMethods(descriptor: ClassDescriptor, model: JsClassModel) {
