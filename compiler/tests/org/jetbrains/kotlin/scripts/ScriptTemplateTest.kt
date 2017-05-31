@@ -313,7 +313,7 @@ open class TestKotlinScriptDummyDependenciesResolver : ScriptDependenciesResolve
     ): Future<KotlinScriptExternalDependencies?>
     {
         return object : KotlinScriptExternalDependencies {
-            override val classpath: Iterable<File> = classpathFromClassloader()
+            override val classpath: Iterable<File> = classpathFromClassloader() + classpathFromClasspathProperty()
             override val imports: Iterable<String> = listOf("org.jetbrains.kotlin.scripts.DependsOn", "org.jetbrains.kotlin.scripts.DependsOnTwo")
         }.asFuture()
     }
@@ -324,6 +324,14 @@ open class TestKotlinScriptDummyDependenciesResolver : ScriptDependenciesResolve
                     ?.filter { it.path.contains("out") && it.path.contains("test") }
             ?: emptyList()
 }
+
+private fun classpathFromClasspathProperty(): List<File> =
+        System.getProperty("kotlin.test.script.classpath")
+                ?.split(String.format("\\%s", File.pathSeparatorChar).toRegex())
+                ?.dropLastWhile(String::isEmpty)
+                ?.map(::File)
+                ?: emptyList()
+
 
 class TestKotlinScriptDependenciesResolver : TestKotlinScriptDummyDependenciesResolver() {
 
@@ -351,7 +359,7 @@ class TestKotlinScriptDependenciesResolver : TestKotlinScriptDummyDependenciesRe
             }
         }
         return object : KotlinScriptExternalDependencies {
-            override val classpath: Iterable<File> = classpathFromClassloader() + cp
+            override val classpath: Iterable<File> = classpathFromClassloader() + classpathFromClasspathProperty() + cp
             override val imports: Iterable<String> = listOf("org.jetbrains.kotlin.scripts.DependsOn", "org.jetbrains.kotlin.scripts.DependsOnTwo")
         }.asFuture()
     }
