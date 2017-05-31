@@ -115,6 +115,8 @@ public final class Namer {
     public static final String ENUM_NAME_FIELD = "name$";
     public static final String ENUM_ORDINAL_FIELD = "ordinal$";
 
+    public static final String IMPORTS_PROPERTY = "$$imports$$";
+
     @NotNull
     public static String getFunctionTag(@NotNull CallableDescriptor functionDescriptor, @NotNull JsConfig config) {
         String intrinsicTag = ArrayFIF.INSTANCE.getTag(functionDescriptor, config);

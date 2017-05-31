@@ -26,9 +26,13 @@ import org.jetbrains.kotlin.descriptors.impl.TypeAliasConstructorDescriptor;
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation;
 import org.jetbrains.kotlin.js.backend.ast.*;
 import org.jetbrains.kotlin.js.backend.ast.metadata.MetadataProperties;
+import org.jetbrains.kotlin.js.backend.ast.metadata.SideEffectKind;
 import org.jetbrains.kotlin.js.config.JsConfig;
+import org.jetbrains.kotlin.js.naming.NameSuggestionKt;
+import org.jetbrains.kotlin.js.naming.SuggestedName;
 import org.jetbrains.kotlin.js.translate.intrinsic.Intrinsics;
 import org.jetbrains.kotlin.js.translate.reference.ReferenceTranslator;
+import org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils;
 import org.jetbrains.kotlin.js.translate.utils.JsAstUtils;
 import org.jetbrains.kotlin.js.translate.utils.TranslationUtils;
 import org.jetbrains.kotlin.name.Name;
@@ -38,12 +42,15 @@ import org.jetbrains.kotlin.resolve.BindingTrace;
 import org.jetbrains.kotlin.resolve.DescriptorUtils;
 import org.jetbrains.kotlin.resolve.descriptorUtil.DescriptorUtilsKt;
 import org.jetbrains.kotlin.resolve.scopes.receivers.ExtensionReceiver;
+import org.jetbrains.kotlin.serialization.js.ModuleKind;
 
 import java.util.*;
 
 import static org.jetbrains.kotlin.js.descriptorUtils.DescriptorUtilsKt.isCoroutineLambda;
 import static org.jetbrains.kotlin.js.translate.context.UsageTrackerKt.getNameForCapturedDescriptor;
+import static org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils.isNativeObject;
 import static org.jetbrains.kotlin.js.translate.utils.BindingUtils.getDescriptorForElement;
+import static org.jetbrains.kotlin.js.translate.utils.JsAstUtils.pureFqn;
 
 /**
  * All the info about the state of the translation process.
@@ -65,6 +72,8 @@ public class TranslationContext {
     private final ClassDescriptor classDescriptor;
     @Nullable
     private final VariableDescriptor continuationParameterDescriptor;
+
+    private final Set<String> importedModules = new HashSet<>();
 
     @NotNull
     public static TranslationContext rootContext(@NotNull StaticContext staticContext) {
@@ -265,15 +274,114 @@ public class TranslationContext {
 
     @NotNull
     public JsNameRef getQualifiedReference(@NotNull DeclarationDescriptor descriptor) {
+        JsNameRef result = staticContext.getQualifiedReference(descriptor);
         if (descriptor instanceof MemberDescriptor && isFromCurrentModule(descriptor) && isPublicInlineFunction()) {
             staticContext.export((MemberDescriptor) descriptor, true);
         }
-        return staticContext.getQualifiedReference(descriptor);
+        else if (!isFromCurrentModule(descriptor)) {
+            ModuleDescriptor module = DescriptorUtils.getContainingModule(descriptor);
+            ModuleDescriptor currentModule = staticContext.getCurrentModule();
+            if (module != currentModule && !isInlineFunction(descriptor)) {
+                result = reimportModule(currentModule, module, result);
+            }
+        }
+        return result;
+    }
+
+    private static boolean isInlineFunction(@NotNull DeclarationDescriptor descriptor) {
+        if (!(descriptor instanceof FunctionDescriptor)) return false;
+        return ((FunctionDescriptor) descriptor).isInline();
+    }
+
+    @NotNull
+    private JsNameRef reimportModule(@NotNull ModuleDescriptor currentModule, @NotNull ModuleDescriptor module, @NotNull JsNameRef fqn) {
+        if (currentModule.getBuiltIns().getBuiltInsModule() == module) return fqn;
+
+        String moduleName = StaticContext.suggestModuleName(module);
+        if (moduleName.equals(Namer.KOTLIN_LOWER_NAME)) return fqn;
+
+        return reimportModule(currentModule, moduleName, staticContext.getInnerNameForDescriptor(module), fqn);
+    }
+
+    private JsNameRef reimportModule(
+            @NotNull ModuleDescriptor currentModule,
+            @NotNull String moduleId, @NotNull JsName moduleName,
+            @NotNull JsNameRef fqn) {
+        JsExpression currentModuleRef = pureFqn(staticContext.getInnerNameForDescriptor(currentModule), null);
+        JsExpression importsRef = pureFqn(Namer.IMPORTS_PROPERTY, currentModuleRef);
+        JsExpression currentImports = pureFqn(staticContext.getNameForImports(), null);
+
+        JsExpression moduleRef;
+        JsExpression lhsModuleRef;
+        if (NameSuggestionKt.isValidES5Identifier(moduleId)) {
+            moduleRef = pureFqn(moduleId, importsRef);
+            lhsModuleRef = pureFqn(moduleId, currentImports);
+        }
+        else {
+            moduleRef = new JsArrayAccess(importsRef, new JsStringLiteral(moduleId));
+            MetadataProperties.setSideEffects(moduleRef, SideEffectKind.PURE);
+            lhsModuleRef = new JsArrayAccess(currentImports, new JsStringLiteral(moduleId));
+        }
+
+        fqn = (JsNameRef) replaceModuleReference(fqn, moduleName, moduleRef);
+
+        if (importedModules.add(moduleId)) {
+            JsExpressionStatement importStmt = new JsExpressionStatement(JsAstUtils.assignment(lhsModuleRef, moduleName.makeRef()));
+            MetadataProperties.setExportedTag(importStmt, "imports:" + moduleId);
+            staticContext.getFragment().getExportBlock().getStatements().add(importStmt);
+        }
+
+        return fqn;
+    }
+
+    private static JsExpression replaceModuleReference(
+            @NotNull JsExpression expression,
+            @NotNull JsName expectedModuleName,
+            @NotNull JsExpression reexportExpr
+    ) {
+        if (expression instanceof JsNameRef) {
+            JsNameRef nameRef = (JsNameRef) expression;
+            if (nameRef.getQualifier() == null) {
+                return expectedModuleName == nameRef.getName() ? reexportExpr : expression;
+            }
+            else {
+                JsExpression newQualifier = replaceModuleReference(nameRef.getQualifier(), expectedModuleName, reexportExpr);
+                if (newQualifier == nameRef.getQualifier()) {
+                    return expression;
+                }
+                JsExpression result = nameRef.getName() != null ?
+                                      new JsNameRef(nameRef.getName(), newQualifier) :
+                                      new JsNameRef(nameRef.getIdent(), newQualifier);
+                result.copyMetadataFrom(nameRef);
+                return result;
+            }
+        }
+        else {
+            return expression;
+        }
     }
 
     @NotNull
     public JsNameRef getInnerReference(@NotNull DeclarationDescriptor descriptor) {
-        return JsAstUtils.pureFqn(getInnerNameForDescriptor(descriptor), null);
+        JsNameRef result = pureFqn(getInnerNameForDescriptor(descriptor), null);
+
+        SuggestedName suggested = staticContext.suggestName(descriptor);
+        if (suggested != null && getConfig().getModuleKind() != ModuleKind.PLAIN && isPublicInlineFunction()) {
+            String moduleId = AnnotationsUtils.getModuleName(suggested.getDescriptor());
+            if (moduleId != null && result.getName() != null && result.getQualifier() == null) {
+                result = reimportModule(getCurrentModule(), moduleId, result.getName(), result);
+            }
+            else if (isNativeObject(suggested.getDescriptor()) && DescriptorUtils.isTopLevelDeclaration(suggested.getDescriptor())) {
+                String fileModuleId = AnnotationsUtils.getFileModuleName(bindingContext(), suggested.getDescriptor());
+                if (fileModuleId != null) {
+                    JsName fileModuleName = staticContext.getImportedModule(fileModuleId, null).getInternalName();
+                    result = reimportModule(getCurrentModule(), fileModuleId, fileModuleName,
+                                            staticContext.getQualifiedReference(descriptor));
+                }
+            }
+        }
+
+        return result;
     }
 
     @NotNull
