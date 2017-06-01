@@ -204,7 +204,8 @@ class AnnotationChecker(private val additionalCheckers: Iterable<AdditionalAnnot
                 is KtProperty -> {
                     if (annotated.isLocal)
                         TargetLists.T_LOCAL_VARIABLE
-                    else if (annotated.parent is KtClassOrObject || annotated.parent is KtClassBody)
+                    else if (annotated.parent is KtClassOrObject || annotated.parent is KtClassBody ||
+                             annotated.parent is KtBlockExpression && annotated.parent.parent is KtScript)
                         TargetLists.T_MEMBER_PROPERTY(descriptor.hasBackingField(trace), annotated.hasDelegate())
                     else
                         TargetLists.T_TOP_LEVEL_PROPERTY(descriptor.hasBackingField(trace), annotated.hasDelegate())
