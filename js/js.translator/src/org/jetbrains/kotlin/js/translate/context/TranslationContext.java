@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.js.config.JsConfig;
 import org.jetbrains.kotlin.js.naming.NameSuggestionKt;
 import org.jetbrains.kotlin.js.naming.SuggestedName;
 import org.jetbrains.kotlin.js.translate.intrinsic.Intrinsics;
+import org.jetbrains.kotlin.js.translate.reference.CallExpressionTranslator;
 import org.jetbrains.kotlin.js.translate.reference.ReferenceTranslator;
 import org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils;
 import org.jetbrains.kotlin.js.translate.utils.JsAstUtils;
@@ -41,6 +42,7 @@ import org.jetbrains.kotlin.resolve.BindingContext;
 import org.jetbrains.kotlin.resolve.BindingTrace;
 import org.jetbrains.kotlin.resolve.DescriptorUtils;
 import org.jetbrains.kotlin.resolve.descriptorUtil.DescriptorUtilsKt;
+import org.jetbrains.kotlin.resolve.inline.InlineUtil;
 import org.jetbrains.kotlin.resolve.scopes.receivers.ExtensionReceiver;
 import org.jetbrains.kotlin.serialization.js.ModuleKind;
 
@@ -275,22 +277,26 @@ public class TranslationContext {
     @NotNull
     public JsNameRef getQualifiedReference(@NotNull DeclarationDescriptor descriptor) {
         JsNameRef result = staticContext.getQualifiedReference(descriptor);
-        if (descriptor instanceof MemberDescriptor && isFromCurrentModule(descriptor) && isPublicInlineFunction()) {
-            staticContext.export((MemberDescriptor) descriptor, true);
-        }
-        else if (!isFromCurrentModule(descriptor)) {
-            ModuleDescriptor module = DescriptorUtils.getContainingModule(descriptor);
-            ModuleDescriptor currentModule = staticContext.getCurrentModule();
-            if (module != currentModule && !isInlineFunction(descriptor)) {
-                result = reimportModule(currentModule, module, result);
+        if (isPublicInlineFunction()) {
+            if (isFromCurrentModule(descriptor)) {
+                if (descriptor instanceof MemberDescriptor) {
+                    staticContext.export((MemberDescriptor) descriptor, true);
+                }
+            }
+            else {
+                ModuleDescriptor module = DescriptorUtils.getContainingModule(descriptor);
+                ModuleDescriptor currentModule = staticContext.getCurrentModule();
+                if (module != currentModule && !isInlineFunction(descriptor)) {
+                    result = reimportModule(currentModule, module, result);
+                }
             }
         }
         return result;
     }
 
-    private static boolean isInlineFunction(@NotNull DeclarationDescriptor descriptor) {
-        if (!(descriptor instanceof FunctionDescriptor)) return false;
-        return ((FunctionDescriptor) descriptor).isInline();
+    private boolean isInlineFunction(@NotNull DeclarationDescriptor descriptor) {
+        if (!(descriptor instanceof CallableDescriptor)) return false;
+        return CallExpressionTranslator.shouldBeInlined((CallableDescriptor) descriptor, this);
     }
 
     @NotNull

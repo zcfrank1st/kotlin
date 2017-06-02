@@ -195,8 +195,7 @@ fun JsFunction.fillCoroutineMetadata(
     )
 }
 
-fun definePackageAlias(name: String, varName: JsName, tag: String, parentFactory: () -> JsExpression): JsStatement {
-    val parentRef = parentFactory()
+fun definePackageAlias(name: String, varName: JsName, tag: String, parentRef: JsExpression): JsStatement {
     val selfRef = JsNameRef(name, parentRef)
     val rhs = JsAstUtils.or(selfRef, JsAstUtils.assignment(selfRef.deepCopy(), JsObjectLiteral(false)))
 

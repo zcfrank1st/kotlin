@@ -135,9 +135,8 @@ internal class DeclarationExporter(val context: StaticContext) {
         if (name == null) {
             name = JsScope.declareTemporaryName("package$" + packageName.shortName().asString())
             localPackageNames[packageName] = name
-            statements += definePackageAlias(packageName.shortName().asString(), name, packageName.asString()) {
-                getLocalPackageReference(packageName.parent() )
-            }
+            statements += definePackageAlias(packageName.shortName().asString(), name, packageName.asString(),
+                                             getLocalPackageReference(packageName.parent()))
         }
         return name.makeRef()
     }

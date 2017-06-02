@@ -171,7 +171,7 @@ class Merger(private val rootFunction: JsFunction, val internalModuleName: JsNam
 
     private fun MutableList<JsStatement>.addImportDeclarationIfNecessary() {
         val importsName = nameTable[Namer.IMPORTS_PROPERTY] ?: return
-        this += definePackageAlias(Namer.IMPORTS_PROPERTY, importsName, Namer.IMPORTS_PROPERTY) { JsNameRef(Namer.getRootPackageName()) }
+        this += definePackageAlias(Namer.IMPORTS_PROPERTY, importsName, Namer.IMPORTS_PROPERTY, JsNameRef(Namer.getRootPackageName()))
     }
 
     private fun addClassPrototypes(statements: MutableList<JsStatement>) {
