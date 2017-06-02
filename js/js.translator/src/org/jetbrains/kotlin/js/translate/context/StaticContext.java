@@ -139,7 +139,7 @@ public final class StaticContext {
     private final ClassModelGenerator classModelGenerator;
 
     @Nullable
-    private JsName nameForImports;
+    private JsName nameForImportsForInline;
 
     public StaticContext(
             @NotNull BindingTrace bindingTrace,
@@ -802,15 +802,15 @@ public final class StaticContext {
     }
 
     @NotNull
-    public JsName getNameForImports() {
-        if (nameForImports == null) {
-            JsName name = JsScope.declareTemporaryName(Namer.IMPORTS_PROPERTY);
-            fragment.getNameBindings().add(new JsNameBinding(Namer.IMPORTS_PROPERTY, name));
-            nameForImports = name;
+    public JsName getNameForImportsForInline() {
+        if (nameForImportsForInline == null) {
+            JsName name = JsScope.declareTemporaryName(Namer.IMPORTS_FOR_INLINE_PROPERTY);
+            fragment.getNameBindings().add(new JsNameBinding(Namer.IMPORTS_FOR_INLINE_PROPERTY, name));
+            nameForImportsForInline = name;
             return name;
         }
         else {
-            return nameForImports;
+            return nameForImportsForInline;
         }
     }
 }

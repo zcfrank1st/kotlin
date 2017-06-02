@@ -159,7 +159,7 @@ class Merger(private val rootFunction: JsFunction, val internalModuleName: JsNam
     // Adds different boilerplate code (like imports, class prototypes, etc) to resulting program.
     fun merge() {
         rootFunction.body.statements.apply {
-            addImportDeclarationIfNecessary()
+            addImportForInlineDeclarationIfNecessary()
             this += importBlock.statements
             addClassPrototypes(this)
             this += declarationBlock.statements
@@ -169,9 +169,10 @@ class Merger(private val rootFunction: JsFunction, val internalModuleName: JsNam
         }
     }
 
-    private fun MutableList<JsStatement>.addImportDeclarationIfNecessary() {
-        val importsName = nameTable[Namer.IMPORTS_PROPERTY] ?: return
-        this += definePackageAlias(Namer.IMPORTS_PROPERTY, importsName, Namer.IMPORTS_PROPERTY, JsNameRef(Namer.getRootPackageName()))
+    private fun MutableList<JsStatement>.addImportForInlineDeclarationIfNecessary() {
+        val importsForInlineName = nameTable[Namer.IMPORTS_FOR_INLINE_PROPERTY] ?: return
+        this += definePackageAlias(Namer.IMPORTS_FOR_INLINE_PROPERTY, importsForInlineName, Namer.IMPORTS_FOR_INLINE_PROPERTY,
+                                   JsNameRef(Namer.getRootPackageName()))
     }
 
     private fun addClassPrototypes(statements: MutableList<JsStatement>) {
