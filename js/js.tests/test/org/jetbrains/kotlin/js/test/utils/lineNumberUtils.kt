@@ -22,6 +22,6 @@ import org.jetbrains.kotlin.js.util.TextOutputImpl
 fun JsProgram.toStringWithLineNumbers(): String {
     val output = TextOutputImpl()
     val lineCollector = LineCollector().also { it.accept(this) }
-    LineOutputToStringVisitor(output, lineCollector).also { it.accept(this.globalBlock) }
+    LineOutputToStringVisitor(output, lineCollector).accept(this.globalBlock)
     return output.toString()
 }
