@@ -54,16 +54,14 @@ class AmbiguousAstSourcePropagation : RecursiveJsVisitor() {
         sourceDefined = old
     }
     
-    private fun acceptAll(node: JsNode, vararg x: JsNode) {
-        val first = x.firstOrNull() ?: return
-
+    private fun acceptAll(node: JsNode, first: JsNode, vararg remaining: JsNode) {
         val old = sourceDefined
         propagate(node)
         
         accept(first)
 
         sourceDefined = false
-        x.drop(1).forEach { accept(it) }
+        remaining.forEach { accept(it) }
         sourceDefined = old
     }
 
