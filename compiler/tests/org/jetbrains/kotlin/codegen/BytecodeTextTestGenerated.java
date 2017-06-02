@@ -1818,6 +1818,21 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
         }
     }
 
+    @TestMetadata("compiler/testData/codegen/bytecodeText/peepholer")
+    @TestDataPath("$PROJECT_ROOT")
+    @RunWith(JUnit3RunnerWithInners.class)
+    public static class Peepholer extends AbstractBytecodeTextTest {
+        public void testAllFilesPresentInPeepholer() throws Exception {
+            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/bytecodeText/peepholer"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
+        }
+
+        @TestMetadata("ifNot.kt")
+        public void testIfNot() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/peepholer/ifNot.kt");
+            doTest(fileName);
+        }
+    }
+
     @TestMetadata("compiler/testData/codegen/bytecodeText/ranges")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)

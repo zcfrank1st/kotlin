@@ -55,6 +55,7 @@ class OptimizationMethodVisitor(
                 ConstantConditionEliminationMethodTransformer(),
                 RedundantBoxingMethodTransformer(),
                 PopBackwardPropagationTransformer(),
+                PeepholeMethodTransformer(),
                 DeadCodeEliminationMethodTransformer(),
                 RedundantGotoMethodTransformer(),
                 RedundantNopsCleanupMethodTransformer()
