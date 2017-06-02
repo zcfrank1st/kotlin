@@ -65,6 +65,7 @@
         <fileset dir="${dependencies}" includes="jansi.jar"/>
         <fileset dir="${dependencies}" includes="jline.jar"/>
         <fileset dir="${dependencies}" includes="javaslang-2.0.6.jar"/>
+        <fileset dir="${dependencies}" includes="json-org.jar"/>
         <fileset dir="${basedir}/ideaSDK/jps" includes="jps-model.jar"/>
     </path>
 
