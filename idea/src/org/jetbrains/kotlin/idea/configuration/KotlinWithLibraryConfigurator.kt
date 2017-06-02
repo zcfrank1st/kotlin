@@ -103,6 +103,14 @@ abstract class KotlinWithLibraryConfigurator internal constructor() : KotlinProj
         collector.showNotification()
     }
 
+    fun configureSilently(project: Project) {
+        val defaultPathToJar = getDefaultPathToJarFile(project)
+        val collector = createConfigureKotlinNotificationCollector(project)
+        for (module in ModuleManager.getInstance(project).modules) {
+            configureModuleWithLibrary(module, defaultPathToJar, null, collector)
+        }
+    }
+
     protected fun configureModuleWithLibrary(
             module: Module,
             defaultPath: String,
