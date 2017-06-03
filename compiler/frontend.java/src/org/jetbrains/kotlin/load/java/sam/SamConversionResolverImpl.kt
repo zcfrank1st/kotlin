@@ -16,32 +16,14 @@
 
 package org.jetbrains.kotlin.load.java.sam
 
-import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.load.java.components.SamConversionResolver
-import org.jetbrains.kotlin.load.java.descriptors.*
-import org.jetbrains.kotlin.load.java.lazy.descriptors.LazyJavaClassDescriptor
+import org.jetbrains.kotlin.load.java.descriptors.JavaClassConstructorDescriptor
+import org.jetbrains.kotlin.load.java.descriptors.JavaClassDescriptor
+import org.jetbrains.kotlin.load.java.descriptors.SamAdapterDescriptor
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.SimpleType
 
 class SamConversionResolverImpl(val storageManager: StorageManager, val samWithReceiverResolver: SamWithReceiverResolver): SamConversionResolver {
-    override fun resolveSamConstructor(constructorOwner: DeclarationDescriptor, classifier: () -> ClassifierDescriptor?): SamConstructorDescriptor? {
-        val classifierDescriptor = classifier()
-        if (classifierDescriptor !is LazyJavaClassDescriptor || classifierDescriptor.functionTypeForSamInterface == null) return null
-        return SingleAbstractMethodUtils.createSamConstructorFunction(constructorOwner, classifierDescriptor)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <D : FunctionDescriptor> resolveSamAdapter(original: D): D? {
-        return when {
-            !SingleAbstractMethodUtils.isSamAdapterNecessary(original) -> null
-            original is JavaClassConstructorDescriptor -> SingleAbstractMethodUtils.createSamAdapterConstructor(original) as D
-            original is JavaMethodDescriptor -> SingleAbstractMethodUtils.createSamAdapterFunction(original) as D
-            else -> null
-        }
-    }
-
     private val samConstructorForConstructor =
             storageManager.createMemoizedFunction<JavaClassConstructorDescriptor, SamAdapterDescriptor<JavaClassConstructorDescriptor>> { constructor ->
                 SingleAbstractMethodUtils.createSamAdapterConstructor(constructor)
