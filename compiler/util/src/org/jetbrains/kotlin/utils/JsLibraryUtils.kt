@@ -53,19 +53,18 @@ object JsLibraryUtils {
             lib.isDirectory -> traverseDirectory(lib, action)
             FileUtil.isJarOrZip(lib) -> traverseArchive(lib, action)
             lib.name.endsWith(KotlinJavascriptMetadataUtils.JS_EXT) -> {
-                lib.runIfFileExists(action)
+                lib.runIfFileExists(lib.path, action)
                 val jsFile = lib.withReplacedExtensionOrNull(
                         KotlinJavascriptMetadataUtils.META_JS_SUFFIX, KotlinJavascriptMetadataUtils.JS_EXT
                 )
-                jsFile?.runIfFileExists(action)
+                jsFile?.runIfFileExists(jsFile.path, action)
             }
         }
     }
 
-    private fun File.runIfFileExists(action: (JsLibrary) -> Unit) {
+    private fun File.runIfFileExists(relativePath: String, action: (JsLibrary) -> Unit) {
         if (isFile) {
-            val mapFile = File(parentFile, name + ".map")
-            action(JsLibrary(readText(), this.path, mapFile.sourceMapIfExists()))
+            action(JsLibrary(readText(), relativePath, correspondingSourceMapFile().contentIfExists()))
         }
     }
 
@@ -75,16 +74,17 @@ object JsLibraryUtils {
         }
     }
 
-    private fun File.sourceMapIfExists(): String? = if (exists()) readText() else null
+    private fun File.contentIfExists(): String? = if (exists()) readText() else null
+
+    private fun File.correspondingSourceMapFile(): File = File(parentFile, name + ".map")
 
     private fun processDirectory(dir: File, action: (JsLibrary) -> Unit) {
         FileUtil.processFilesRecursively(dir, Processor<File> { file ->
             val relativePath = FileUtil.getRelativePath(dir, file)
                                ?: throw IllegalArgumentException("relativePath should not be null $dir $file")
-            if (file.isFile && relativePath.endsWith(KotlinJavascriptMetadataUtils.JS_EXT)) {
+            if (relativePath.endsWith(KotlinJavascriptMetadataUtils.JS_EXT)) {
                 val suggestedRelativePath = getSuggestedPath(relativePath) ?: return@Processor true
-                val mapFile = File(file.parentFile, file.name + ".map")
-                action(JsLibrary(file.readText(), suggestedRelativePath, mapFile.sourceMapIfExists()))
+                file.runIfFileExists(suggestedRelativePath, action)
             }
             true
         })
