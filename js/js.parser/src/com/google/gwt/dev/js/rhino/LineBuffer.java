@@ -266,7 +266,7 @@ final class LineBuffer {
 
         // set lineStart to a sentinel value, unless this is the first
         // time around.
-        prevStart = lineStart = (otherBuffer == null) ? 0 : lineStart - BUFLEN;
+        prevStart = lineStart = (otherBuffer == null) ? 0 : lineStart - end;
 
         offset = 0;
         end = in.read(buffer, 0, buffer.length);
