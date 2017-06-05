@@ -64,8 +64,8 @@ object SourceMapParser {
         val sources = if (jsonObject.has("sources")) {
             val sourcesProperty = jsonObject.get("sources") as? JSONArray ?:
                                   return SourceMapError("'sources' property is not of array type")
-            (0 until sourcesProperty.length()).map {
-                sourcesProperty[it] as? String ?: return SourceMapError("'sources' array must contain strings")
+            sourcesProperty.map {
+                it as? String ?: return SourceMapError("'sources' array must contain strings")
             }
         }
         else {
