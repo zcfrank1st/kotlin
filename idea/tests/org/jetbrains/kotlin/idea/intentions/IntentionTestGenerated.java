@@ -12950,6 +12950,12 @@ public class IntentionTestGenerated extends AbstractIntentionTest {
             doTest(fileName);
         }
 
+        @TestMetadata("lambdaValue.kt")
+        public void testLambdaValue() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/intentions/removeExplicitTypeArguments/lambdaValue.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("literalAny.kt")
         public void testLiteralAny() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("idea/testData/intentions/removeExplicitTypeArguments/literalAny.kt");
