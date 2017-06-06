@@ -32,15 +32,11 @@ open class JsIncrementalCache(
     protected val String.storageFile: File
         get() = File(cachesDir, this + "." + CACHE_EXTENSION)
 
-    private val translationResults = registerMap(TranslationResultMap(TRANSLATION_RESULT_MAP.storageFile))
-
-    fun registerDirtySourceFiles(dirtySourceFiles: List<File>) {
-        dirtySourceFiles.forEach { translationResults.remove(it) }
-    }
+    val translationResults = registerMap(TranslationResultMap(TRANSLATION_RESULT_MAP.storageFile))
 }
 
 @Suppress("ArrayInDataClass")
-private data class TranslationResultValue(val metadata: ByteArray, val binaryAst: ByteArray)
+data class TranslationResultValue(val metadata: ByteArray, val binaryAst: ByteArray)
 private object TranslationResultValueExternalizer : DataExternalizer<TranslationResultValue> {
     override fun save(output: DataOutput, value: TranslationResultValue) {
         output.writeInt(value.metadata.size)
@@ -63,7 +59,7 @@ private object TranslationResultValueExternalizer : DataExternalizer<Translation
     }
 }
 
-private class TranslationResultMap(storageFile: File) : BasicStringMap<TranslationResultValue>(storageFile, TranslationResultValueExternalizer) {
+class TranslationResultMap(storageFile: File) : BasicStringMap<TranslationResultValue>(storageFile, TranslationResultValueExternalizer) {
     override fun dumpValue(value: TranslationResultValue): String =
             "Metadata: ${value.metadata.md5String()}, Binary AST: ${value.binaryAst.md5String()}"
 

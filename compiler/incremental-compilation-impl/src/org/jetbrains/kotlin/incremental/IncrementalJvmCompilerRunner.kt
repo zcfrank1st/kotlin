@@ -46,6 +46,7 @@ import org.jetbrains.kotlin.js.config.JsConfig
 import org.jetbrains.kotlin.js.facade.K2JSTranslator
 import org.jetbrains.kotlin.js.facade.MainCallParameters
 import org.jetbrains.kotlin.js.facade.TranslationResult
+import org.jetbrains.kotlin.js.facade.TranslationUnit
 import org.jetbrains.kotlin.js.translate.general.FileTranslationResult
 import org.jetbrains.kotlin.load.kotlin.header.KotlinClassHeader
 import org.jetbrains.kotlin.modules.TargetId
@@ -185,6 +186,8 @@ class IncrementalJsCompilerRunner(
 
         if (changedFiles !is ChangedFiles.Known) return rebuild { "inputs' changes are unknown (first or clean build)" }
 
+        if (changedFiles.removed.isNotEmpty()) return rebuild { "some files were removed" }
+
         val dirtyFiles = HashSet<File>(with(changedFiles) { modified.size + removed.size})
         with(changedFiles) {
             modified.asSequence() + removed.asSequence()
@@ -219,23 +222,33 @@ class IncrementalJsCompilerRunner(
         var exitCode = ExitCode.OK
         while (dirtySources.any()) {
             val (sourcesToCompile, removedKotlinSources) = dirtySources.partition(File::exists)
+            assert(removedKotlinSources.isEmpty()) // todo !!
 
             allSourcesToCompile.addAll(sourcesToCompile)
             // todo: val text = allSourcesToCompile.map { it.canonicalPath }.joinToString(separator = System.getProperty("line.separator"))
             // todo: dirtySourcesSinceLastTimeFile.writeText(text)
+            val binaryMetadata = mutableListOf<ByteArray>()
+            val binaryAst = mutableListOf<ByteArray>()
 
-            val compilerOutput = compileChanged(sourcesToCompile.toSet(), args, cache, messageCollector)
-            exitCode = compilerOutput.exitCode
-            val generatedClassFiles = compilerOutput.generatedFiles
+            if (compilationMode is CompilationMode.Incremental) {
+                for (dirtyFile in sourcesToCompile) {
+                    val translationResultsCache = cache.translationResults
+                    translationResultsCache.remove(dirtyFile)
+                    translationResultsCache.values().forEach {
+                        binaryMetadata.add(it.metadata)
+                        binaryAst.add(it.binaryAst)
+                    }
+                }
+            }
+
+            val (exitCode1, generatedClassFiles, metadataHeader) = compileChanged(sourcesToCompile.toSet(), args, messageCollector)
+            exitCode = exitCode1
 
             if (exitCode == ExitCode.OK) {
                 //dirtySourcesSinceLastTimeFile.delete()
             } else {
                 break
             }
-
-            allGeneratedFiles.addAll(generatedClassFiles)
-            // todo save to caches
 
             if (compilationMode is CompilationMode.Rebuild) {
                 break
@@ -251,7 +264,6 @@ class IncrementalJsCompilerRunner(
 
     private fun compileChanged(
             sourcesToCompile: Set<File>,
-            ,
             args: K2JSCompilerArguments,
             messageCollector: MessageCollector
     ): CompileChangedResults {
@@ -287,9 +299,9 @@ class IncrementalJsCompilerRunner(
         //reporter.report { "compiling with args: ${ArgumentUtils.convertArgumentsToStringList(args)}" }
         //reporter.report { "compiling with classpath: ${classpath.toList().sorted().joinToString()}" }
         val exitCode = compiler.exec(messageCollector, Services.EMPTY, args)
-        val generatedFiles = outputItemCollector.generatedFiles(targets, targets.first(), {sourcesToCompile}, {outputDir})
+        //val generatedFiles = outputItemCollector.generatedFiles(targets, targets.first(), {sourcesToCompile}, {outputDir})
         reporter.reportCompileIteration(sourcesToCompile, exitCode)
-        return CompileChangedResults(exitCode, generatedFiles)
+        return CompileChangedResults(exitCode, compiler.translationResults, compiler.translatedMetadataHeader)
 
     }
 
