@@ -50,6 +50,7 @@ import org.jetbrains.kotlin.js.config.JsConfig;
 import org.jetbrains.kotlin.js.facade.K2JSTranslator;
 import org.jetbrains.kotlin.js.facade.MainCallParameters;
 import org.jetbrains.kotlin.js.facade.TranslationResult;
+import org.jetbrains.kotlin.js.facade.exceptions.TranslationException;
 import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStatus;
 import org.jetbrains.kotlin.psi.KtFile;
 import org.jetbrains.kotlin.serialization.js.ModuleKind;
@@ -87,6 +88,22 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
     }
 
     @NotNull
+    protected KotlinCoreEnvironment createJsEnvironment(@NotNull CompilerConfiguration configuration, @NotNull Disposable rootDisposable) {
+        return KotlinCoreEnvironment.createForProduction(rootDisposable, configuration, EnvironmentConfigFiles.JS_CONFIG_FILES);
+    }
+
+    @NotNull
+    protected TranslationResult translate(
+            @NotNull List<KtFile> allKotlinFiles,
+            @NotNull JsAnalysisResult jsAnalysisResult,
+            @NotNull MainCallParameters mainCallParameters,
+            @NotNull JsConfig config
+    ) throws TranslationException {
+        K2JSTranslator translator = new K2JSTranslator(config);
+        return translator.translate(allKotlinFiles, mainCallParameters, jsAnalysisResult);
+    }
+
+    @NotNull
     @Override
     protected ExitCode doExecute(
             @NotNull K2JSCompilerArguments arguments, @NotNull CompilerConfiguration configuration, @NotNull Disposable rootDisposable
@@ -102,8 +119,7 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
         }
 
         ContentRootsKt.addKotlinSourceRoots(configuration, arguments.freeArgs);
-        KotlinCoreEnvironment environmentForJS =
-                KotlinCoreEnvironment.createForProduction(rootDisposable, configuration, EnvironmentConfigFiles.JS_CONFIG_FILES);
+        KotlinCoreEnvironment environmentForJS = createJsEnvironment(configuration, rootDisposable);
 
         Project project = environmentForJS.getProject();
         List<KtFile> sourcesFiles = environmentForJS.getSourceFiles();
@@ -181,10 +197,9 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
         MainCallParameters mainCallParameters = createMainCallParameters(arguments.main);
         TranslationResult translationResult;
 
-        K2JSTranslator translator = new K2JSTranslator(config);
         try {
             //noinspection unchecked
-            translationResult = translator.translate(sourcesFiles, mainCallParameters, jsAnalysisResult);
+            translationResult = translate(sourcesFiles, jsAnalysisResult, mainCallParameters, config);
         }
         catch (Exception e) {
             throw ExceptionUtilsKt.rethrow(e);
