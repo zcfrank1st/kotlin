@@ -18,7 +18,7 @@ package org.jetbrains.kotlin.generators.mockJDK;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.intellij.openapi.util.io.FileUtil;
+import com.google.common.io.ByteStreams;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -298,7 +298,7 @@ public class GenerateMockJdk {
 
             if (entryNamesToInclude.contains(topLevelClassFile)) {
                 targetJar.putNextEntry(new ZipEntry(entry.getName()));
-                FileUtil.copy(sourceJar.getInputStream(entry), targetJar);
+                ByteStreams.copy(sourceJar.getInputStream(entry), targetJar);
                 foundEntries.add(topLevelClassFile);
             }
         }
@@ -337,7 +337,20 @@ public class GenerateMockJdk {
         String rtJarPath = System.getProperty("rt.jar");
         String srcZipPath = System.getProperty("src.zip");
         if (rtJarPath == null || srcZipPath == null) {
-            throw new AssertionError("Provide path to rt.jar and src.zip in VM options: \"-Drt.jar=... -Dsrc.zip=...\"");
+            String javaHome = System.getProperty("java.home");
+            System.out.println(javaHome);
+            File rtJarFile = new File(javaHome, "lib/rt.jar");
+            if (rtJarFile.exists()) {
+                rtJarPath = rtJarFile.getPath();
+            }
+            File srcZipFile = new File(javaHome, "../src.zip");
+            if (srcZipFile.exists()) {
+                srcZipPath = srcZipFile.getPath();
+            }
+
+            if (rtJarPath == null || srcZipPath == null) {
+                throw new AssertionError("Provide path to rt.jar and src.zip in VM options: \"-Drt.jar=... -Dsrc.zip=...\"");
+            }
         }
 
         File rtJar = new File(rtJarPath);
