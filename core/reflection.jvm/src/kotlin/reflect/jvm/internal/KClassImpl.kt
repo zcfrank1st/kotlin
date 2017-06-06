@@ -28,12 +28,14 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
+import java.io.ObjectStreamException
+import java.io.Serializable
 import kotlin.jvm.internal.TypeIntrinsics
 import kotlin.reflect.*
 import kotlin.reflect.jvm.internal.KDeclarationContainerImpl.MemberBelonginess.DECLARED
 import kotlin.reflect.jvm.internal.KDeclarationContainerImpl.MemberBelonginess.INHERITED
 
-internal class KClassImpl<T : Any>(override val jClass: Class<T>) : KDeclarationContainerImpl(), KClass<T>, KClassifierImpl {
+internal class KClassImpl<T : Any>(override val jClass: Class<T>) : KDeclarationContainerImpl(), KClass<T>, KClassifierImpl, Serializable {
     inner class Data : KDeclarationContainerImpl.Data() {
         val descriptor: ClassDescriptor by ReflectProperties.lazySoft {
             val classId = classId
@@ -152,6 +154,7 @@ internal class KClassImpl<T : Any>(override val jClass: Class<T>) : KDeclaration
                 by ReflectProperties.lazySoft { allNonStaticMembers + allStaticMembers }
     }
 
+    @Transient
     val data = ReflectProperties.lazy { Data() }
 
     override val descriptor: ClassDescriptor get() = data().descriptor

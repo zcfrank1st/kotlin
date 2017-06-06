@@ -16,9 +16,10 @@
 
 package kotlin.jvm.internal
 
+import java.io.Serializable
 import kotlin.reflect.*
 
-public class ClassReference(override val jClass: Class<*>) : KClass<Any>, ClassBasedDeclarationContainer {
+public class ClassReference(override val jClass: Class<*>) : KClass<Any>, ClassBasedDeclarationContainer, Serializable {
     override val simpleName: String?
         get() = error()
 

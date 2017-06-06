@@ -2704,75 +2704,6 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
                 doTest(fileName);
             }
         }
-
-        @TestMetadata("compiler/testData/codegen/box/callableReference/serializability")
-        @TestDataPath("$PROJECT_ROOT")
-        @RunWith(JUnit3RunnerWithInners.class)
-        public static class Serializability extends AbstractJsCodegenBoxTest {
-            public void testAllFilesPresentInSerializability() throws Exception {
-                KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/callableReference/serializability"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JS, true);
-            }
-
-            @TestMetadata("boundWithNotSerializableReceiver.kt")
-            public void testBoundWithNotSerializableReceiver() throws Exception {
-                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/callableReference/serializability/boundWithNotSerializableReceiver.kt");
-                try {
-                    doTest(fileName);
-                }
-                catch (Throwable ignore) {
-                    return;
-                }
-                throw new AssertionError("Looks like this test can be unmuted. Remove IGNORE_BACKEND directive for that.");
-            }
-
-            @TestMetadata("boundWithSerializableReceiver.kt")
-            public void testBoundWithSerializableReceiver() throws Exception {
-                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/callableReference/serializability/boundWithSerializableReceiver.kt");
-                try {
-                    doTest(fileName);
-                }
-                catch (Throwable ignore) {
-                    return;
-                }
-                throw new AssertionError("Looks like this test can be unmuted. Remove IGNORE_BACKEND directive for that.");
-            }
-
-            @TestMetadata("noReflect.kt")
-            public void testNoReflect() throws Exception {
-                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/callableReference/serializability/noReflect.kt");
-                try {
-                    doTest(fileName);
-                }
-                catch (Throwable ignore) {
-                    return;
-                }
-                throw new AssertionError("Looks like this test can be unmuted. Remove IGNORE_BACKEND directive for that.");
-            }
-
-            @TestMetadata("reflectedIsNotSerialized.kt")
-            public void testReflectedIsNotSerialized() throws Exception {
-                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/callableReference/serializability/reflectedIsNotSerialized.kt");
-                try {
-                    doTest(fileName);
-                }
-                catch (Throwable ignore) {
-                    return;
-                }
-                throw new AssertionError("Looks like this test can be unmuted. Remove IGNORE_BACKEND directive for that.");
-            }
-
-            @TestMetadata("withReflect.kt")
-            public void testWithReflect() throws Exception {
-                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/callableReference/serializability/withReflect.kt");
-                try {
-                    doTest(fileName);
-                }
-                catch (Throwable ignore) {
-                    return;
-                }
-                throw new AssertionError("Looks like this test can be unmuted. Remove IGNORE_BACKEND directive for that.");
-            }
-        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/casts")
@@ -20994,6 +20925,99 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
         public void testWithReturnUnit() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/secondaryConstructors/withReturnUnit.kt");
             doTest(fileName);
+        }
+    }
+
+    @TestMetadata("compiler/testData/codegen/box/serializability")
+    @TestDataPath("$PROJECT_ROOT")
+    @RunWith(JUnit3RunnerWithInners.class)
+    public static class Serializability extends AbstractJsCodegenBoxTest {
+        public void testAllFilesPresentInSerializability() throws Exception {
+            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/serializability"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.JS, true);
+        }
+
+        @TestMetadata("boundCallableReferenceWithNotSerializableReceiver.kt")
+        public void testBoundCallableReferenceWithNotSerializableReceiver() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/serializability/boundCallableReferenceWithNotSerializableReceiver.kt");
+            try {
+                doTest(fileName);
+            }
+            catch (Throwable ignore) {
+                return;
+            }
+            throw new AssertionError("Looks like this test can be unmuted. Remove IGNORE_BACKEND directive for that.");
+        }
+
+        @TestMetadata("boundCallableReferenceWithSerializableReceiver.kt")
+        public void testBoundCallableReferenceWithSerializableReceiver() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/serializability/boundCallableReferenceWithSerializableReceiver.kt");
+            try {
+                doTest(fileName);
+            }
+            catch (Throwable ignore) {
+                return;
+            }
+            throw new AssertionError("Looks like this test can be unmuted. Remove IGNORE_BACKEND directive for that.");
+        }
+
+        @TestMetadata("callableReferenceNoReflect.kt")
+        public void testCallableReferenceNoReflect() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/serializability/callableReferenceNoReflect.kt");
+            try {
+                doTest(fileName);
+            }
+            catch (Throwable ignore) {
+                return;
+            }
+            throw new AssertionError("Looks like this test can be unmuted. Remove IGNORE_BACKEND directive for that.");
+        }
+
+        @TestMetadata("callableReferenceWithReflect.kt")
+        public void testCallableReferenceWithReflect() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/serializability/callableReferenceWithReflect.kt");
+            try {
+                doTest(fileName);
+            }
+            catch (Throwable ignore) {
+                return;
+            }
+            throw new AssertionError("Looks like this test can be unmuted. Remove IGNORE_BACKEND directive for that.");
+        }
+
+        @TestMetadata("classLiteral.kt")
+        public void testClassLiteral() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/serializability/classLiteral.kt");
+            try {
+                doTest(fileName);
+            }
+            catch (Throwable ignore) {
+                return;
+            }
+            throw new AssertionError("Looks like this test can be unmuted. Remove IGNORE_BACKEND directive for that.");
+        }
+
+        @TestMetadata("classLiteralNoReflect.kt")
+        public void testClassLiteralNoReflect() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/serializability/classLiteralNoReflect.kt");
+            try {
+                doTest(fileName);
+            }
+            catch (Throwable ignore) {
+                return;
+            }
+            throw new AssertionError("Looks like this test can be unmuted. Remove IGNORE_BACKEND directive for that.");
+        }
+
+        @TestMetadata("reflectedCallableReferenceIsNotSerialized.kt")
+        public void testReflectedCallableReferenceIsNotSerialized() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/serializability/reflectedCallableReferenceIsNotSerialized.kt");
+            try {
+                doTest(fileName);
+            }
+            catch (Throwable ignore) {
+                return;
+            }
+            throw new AssertionError("Looks like this test can be unmuted. Remove IGNORE_BACKEND directive for that.");
         }
     }
 
