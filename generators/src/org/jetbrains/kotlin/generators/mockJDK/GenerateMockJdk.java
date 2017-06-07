@@ -19,10 +19,10 @@ package org.jetbrains.kotlin.generators.mockJDK;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
+import kotlin.jvm.functions.Function2;
+import org.jetbrains.org.objectweb.asm.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -282,7 +282,13 @@ public class GenerateMockJdk {
 
 
 
-    private static void generateFilteredJar(File source, File target, Set<String> entryNamesToInclude, boolean assertAllFound) throws IOException {
+    private static void generateFilteredJar(
+            File source,
+            File target,
+            Set<String> entryNamesToInclude,
+            boolean assertAllFound,
+            Function2<String, InputStream, InputStream> classTransformer
+    ) throws IOException {
         if (!source.exists()) {
             throw new AssertionError(source + " doesn't exist");
         }
@@ -298,7 +304,11 @@ public class GenerateMockJdk {
 
             if (entryNamesToInclude.contains(topLevelClassFile)) {
                 targetJar.putNextEntry(new ZipEntry(entry.getName()));
-                ByteStreams.copy(sourceJar.getInputStream(entry), targetJar);
+                InputStream inputStream =
+                        classTransformer != null
+                        ? classTransformer.invoke(entry.getName(), sourceJar.getInputStream(entry))
+                        : sourceJar.getInputStream(entry);
+                ByteStreams.copy(inputStream, targetJar);
                 foundEntries.add(topLevelClassFile);
             }
         }
@@ -360,12 +370,77 @@ public class GenerateMockJdk {
                 rtJar,
                 new File("compiler/testData/mockJDK/jre/lib/rt.jar"),
                 getClassFileEntries(),
-                true);
+                true, null);
+
         generateFilteredJar(
                 srcJar,
                 new File("compiler/testData/mockJDK/src.zip"),
                 getSourceFileEntries(),
-                false);
+                false, null);
+
+        generateFilteredJar(
+                rtJar,
+                new File("compiler/testData/mockJDKModified/rt.jar"),
+                getClassFileEntries(),
+                false,
+                new Function2<String, InputStream, InputStream>() {
+                    @Override
+                    public InputStream invoke(String classFileName, InputStream stream) {
+                        boolean isCollection = classFileName.equals("java/util/Collection.class");
+                        boolean isThrowable = classFileName.equals("java/lang/Throwable.class");
+                        if (!isCollection && !isThrowable) return stream;
+
+
+                        try {
+                            ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+
+                            new ClassReader(stream).accept(new ClassVisitor(Opcodes.API_VERSION, writer) {
+                                @Override
+                                public void visitEnd() {
+                                    if (isCollection) {
+                                        visitMethod(
+                                                0x401,
+                                                "nonExistingMethod", "(Ljava/lang/Object;)Ljava/lang/String;",
+                                                "(TE;)Ljava/lang/String;", null
+                                        );
+                                    }
+
+                                    if (isThrowable) {
+                                        MethodVisitor visitor = visitMethod(
+                                                0x1,
+                                                "<init>", "(D)V",
+                                                null, null
+                                        );
+                                        Label begin = new Label();
+                                        Label end = new Label();
+                                        visitor.visitLabel(begin);
+
+                                        visitor.visitCode();
+                                        visitor.visitVarInsn(Opcodes.ALOAD, 0);
+                                        visitor.visitMethodInsn(
+                                                Opcodes.INVOKESPECIAL,
+                                                "java/lang/Object",
+                                                "<init>",
+                                                "()V", false
+                                        );
+                                        visitor.visitInsn(Opcodes.ARETURN);
+                                        visitor.visitLabel(end);
+                                        visitor.visitLocalVariable("x", "D", null, begin, end, 1);
+                                        visitor.visitEnd();
+                                    }
+
+                                    super.visitEnd();
+                                }
+                            }, 0);
+
+                            return new ByteArrayInputStream(writer.toByteArray());
+                        }
+                        catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+        );
     }
 
     private GenerateMockJdk() {

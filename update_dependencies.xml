@@ -165,6 +165,12 @@
                 <fileset dir="ideaSDK/lib">
                     <include name="guava*.jar"/>
                 </fileset>
+
+                <fileset dir="ideaSDK/lib">
+                    <include name="asm*.jar"/>
+                </fileset>
+
+                <pathelement location="${dependencies}/bootstrap-compiler/Kotlin/lib/kotlin-runtime.jar"/>
             </classpath>
         </javac>
 
@@ -174,6 +180,12 @@
                 <fileset dir="ideaSDK/lib">
                     <include name="guava*.jar"/>
                 </fileset>
+
+                <fileset dir="ideaSDK/lib">
+                    <include name="asm*.jar"/>
+                </fileset>
+
+                <pathelement location="${dependencies}/bootstrap-compiler/Kotlin/lib/kotlin-runtime.jar"/>
             </classpath>
         </java>
     </target>
