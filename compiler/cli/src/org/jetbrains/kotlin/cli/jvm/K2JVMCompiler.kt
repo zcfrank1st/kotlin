@@ -43,6 +43,7 @@ import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.javac.JavacWrapper
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.load.kotlin.incremental.components.IncrementalCompilationComponents
+import org.jetbrains.kotlin.parsing.KotlinParserDefinition
 import org.jetbrains.kotlin.script.KotlinScriptDefinitionFromAnnotatedTemplate
 import org.jetbrains.kotlin.script.StandardScriptDefinition
 import org.jetbrains.kotlin.util.PerformanceCounter
@@ -93,7 +94,13 @@ class K2JVMCompiler : CLICompiler<K2JVMCompilerArguments>() {
                 messageCollector.report(ERROR, "Specify script source path to evaluate")
                 return COMPILATION_ERROR
             }
-            configuration.addKotlinSourceRoot(arguments.freeArgs[0])
+            val sourcePath = arguments.freeArgs[0]
+            val scriptFile = File(sourcePath)
+            if (scriptFile.isDirectory || scriptFile.extension != KotlinParserDefinition.STD_SCRIPT_SUFFIX) {
+                messageCollector.report(ERROR, "Specify path to the script file (.kts) as the first argument")
+                return COMPILATION_ERROR
+            }
+            configuration.addKotlinSourceRoot(sourcePath)
         }
         else if (arguments.module == null) {
             for (arg in arguments.freeArgs) {
